@@ -7,18 +7,19 @@ class segmented_corpus:
 
 	"""
 
-	final_words		= Counter() #word counts at utterance boundary
-	utter_words		= Counter() #other word counts
+	final_words		= Counter(['het','dit']) #word counts at utterance boundary
+	utter_words		= Counter(['hoi','hoe','is','wa','tis','dit']) #other word counts
 	boundary_count  = 0
+	word_count      = 0
 
 	utterances = ['hoihoeishet','watisdit'] #list of utterances (unseparated)
-	boundaries = [[3,6,8],[2,4]] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
+	boundaries = [[3,6,8],[2,5]] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
 
+	boundary_count = sum([len(b) for b in boundaries])
+	word_count     = boundary_count + len(utterances)
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
-	print sample_list
-	
 
 	def __init__(self):
 		pass
@@ -58,6 +59,30 @@ class segmented_corpus:
 			print "w1: " + w1
 			print "w2: " + w2
 			print "w3: " + w3
+
+		# calculate the word counts over all the OTHER words,
+		# this means that we should substract the counts for the part under consideration (w1)
+		# if the boundary exists, thrn we need to substract 2 words (w2 and w3 are in there right now)
+		# if the boundary does not exist, then we neet to substract 1 word (w1 is in there now)
+		n_total   = max(self.word_count - 1 - int(boundary_exists), 0)
+
+		nw1_final = max(self.final_words[w1] - int(not boundary_exists), 0)
+		nw1_utter = max(self.utter_words[w1] - int(not boundary_exists), 0)
+		nw1_total = nw1_final + nw1_utter
+
+		nw2_final = max(self.final_words[w2] - int(boundary_exists), 0)
+		nw2_utter = max(self.utter_words[w2] - int(boundary_exists), 0)
+		nw2_total = nw2_final + nw2_utter
+
+		nw3_final = max(self.final_words[w3] - int(boundary_exists), 0)
+		nw3_utter = max(self.utter_words[w3] - int(boundary_exists), 0)
+		nw3_total = nw3_final + nw3_utter
+
+		if debug:
+			print n_total, nw1_final, nw1_utter, nw1_total
+			print n_total, nw2_final, nw2_utter, nw2_total
+			print n_total, nw3_final, nw3_utter, nw3_total
+
 
 
 		#calculate P1
