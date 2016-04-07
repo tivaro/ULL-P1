@@ -1,3 +1,5 @@
+import utils
+
 class segmented_corpus:
 	"""
 
@@ -16,9 +18,6 @@ class segmented_corpus:
 	
 
 	def __init__(self):
-		pass
-
-	def load_segmented_corpus(filename, utterance_delimiter = '\n', word_delimiter = ' '):
 		pass
 
 	def initialize_boundaries_randomly():
