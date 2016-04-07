@@ -27,14 +27,22 @@ class segmented_corpus:
 	def initialize_boundaries_randomly():
 		pass
 
+	def P0(self, word):
+		p_dash = 0.5
+		M = len(word)
+		#right now let's use a uniform phoneme distribution
+		#TODO: look this up and find a sensible value!
+		Pphoneme = 1.0 / 26
+		return p_dash * ((p_dash)**(M-1) ) * (Pphoneme ** M)
+
 
 	def gibs_sampler(self, debug=None):
 
 		#parameters:
 		#temperature = 1 #temperature (annealing)
-		#alpha0 = #dirichlet concentration
-		#rho = 2
-		#p$ #word ending probability
+		alpha0 = 20 #dirichlet concentration
+		rho = 2 #parameter of beta prior over utterance end
+		#p# = 0.5
 
 
 		#Randomly draw boundary location
@@ -45,6 +53,7 @@ class segmented_corpus:
 		#Find previous and next boundary
 		prev_b, next_b, boundary_exists, insert_boundary_at = segmented_corpus.neighbours(boundaries, boundary)
 		prev_b = prev_b or 0
+		utterance_final = not next_b
 
 		#find start, end 
 		w1 = utterance[prev_b:next_b]
@@ -78,11 +87,22 @@ class segmented_corpus:
 		nw3_utter = max(self.utter_words[w3] - int(boundary_exists), 0)
 		nw3_total = nw3_final + nw3_utter
 
-		if debug:
-			print n_total, nw1_final, nw1_utter, nw1_total
-			print n_total, nw2_final, nw2_utter, nw2_total
-			print n_total, nw3_final, nw3_utter, nw3_total
+		n_utter_ends = len(self.utterances) - int(utterance_final)
+		nu = n_utter_ends if utterance_final else n_total - n_utter_ends
 
+		p_boundary 	  =	(1.0* (nw1_total + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
+						(1.0 *(nu + (rho/2)) / (n_total + rho))
+
+		p_no_boundary =	(1.0 * (nw2_total + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
+						(1.0 * (n_total - n_utter_ends+ (rho/2)) / (n_total + rho) ) * \
+						(1.0 * (nw3_total + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
+						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
+
+		print 'p( B):', p_boundary
+		print 'p(-B):', p_no_boundary
+
+
+		#print p_boundary
 
 
 		#calculate P1
@@ -146,7 +166,7 @@ class segmented_corpus:
 		return delimiter.join([utterance[(i):(j)] for i, j in zip([0]+boundaries, boundaries+[None])])
 
 
-s= segmented_corpus()
+s = segmented_corpus()
 s.gibs_sampler((1,1) )
 s.gibs_sampler((1,2) )
 s.gibs_sampler((1,3) )
