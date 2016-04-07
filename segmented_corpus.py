@@ -46,12 +46,12 @@ class segmented_corpus:
 		next_b = next_b or len(utterance) - 1
 
 		#find start, end 
-		w1 = utterance[prev_b + 1:next_b + 1]
+		w1 = utterance[prev_b + 1:next_b]
 		w2 = w1[:boundary-prev_b]
 		w3 = w1[boundary-prev_b:]
 
-		print utterance, boundary
-
+		print " " * boundary + 'V' + ' ' * int(boundary_exists) + 'V'
+		print segmented_corpus.insert_boundaries(utterance, boundaries)
 		print w1
 		print w2
 		print w3
@@ -112,6 +112,11 @@ class segmented_corpus:
 			return prev_neighbour, next_neighbour, entry_exists, insert_entry
 		else:
 			return prev_neighbour, next_neighbour
+
+	@staticmethod
+	def insert_boundaries(utterance, boundaries, delimiter = '.'):
+		return delimiter.join([utterance[i:j] for i, j in zip([0]+boundaries, boundaries+[None])])
+
 
 s= segmented_corpus()
 s.gibs_sampler()			
