@@ -7,24 +7,45 @@ class segmented_corpus:
 
 	"""
 
-	word_counts		 = Counter(['hoi','hoe','is','wa','tis','dit','het','dit']) #other word counts
+	word_counts		 = Counter() #other word counts
 	boundary_count   = 0
 	total_word_count = 0
 
-	utterances = ['hoihoeishet','watisdit'] #list of utterances (unseparated)
-	boundaries = [[3,6,8],[2,5]] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
+	utterances = [] #list of utterances (unseparated)
+	boundaries = [] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
 
-	boundary_count 	 = sum([len(b) for b in boundaries])
-	total_word_count = boundary_count + len(utterances)
+
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
 
 	def __init__(self):
-		pass
+		self.initialize_lexicon(['hoihoeishet','watisdit','isditleuk'], [[3,6,8],[2,5],[2,5,7]])
+
+	def initialize_lexicon(self, utterances, boundaries):
+
+		#first store the utterances an boundaries
+		self.utterances = utterances
+		self.boundaries = boundaries
+
+		#now update the statistics
+		self.word_counts      = Counter()
+		self.boundary_count   = 0
+		self.total_word_count = 0
+
+		for utterance, ut_boundaries in zip(utterances, boundaries):
+			words = segmented_corpus.split_utterance(utterance, ut_boundaries)
+			self.word_counts += Counter(words)
+			self.total_word_count += len(words)
+
+		#use the fact that each utterance has words -1 boundaries
+		self.boundary_count   = self.total_word_count - len(self.utterances)
+
+
 
 	def initialize_boundaries_randomly():
 		pass
+
 
 	def P0(self, word):
 		p_dash = 0.5
@@ -154,8 +175,12 @@ class segmented_corpus:
 			return prev_neighbour, next_neighbour
 
 	@staticmethod
+	def split_utterance(utterance, boundaries):
+		return [utterance[(i):(j)] for i, j in zip([0]+boundaries, boundaries+[None])]
+
+	@staticmethod
 	def insert_boundaries(utterance, boundaries, delimiter = '.'):
-		return delimiter.join([utterance[(i):(j)] for i, j in zip([0]+boundaries, boundaries+[None])])
+		return delimiter.join(segmented_corpus.split_utterance(utterance, boundaries))
 
 
 s = segmented_corpus()
