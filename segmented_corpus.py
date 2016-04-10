@@ -24,8 +24,11 @@ class segmented_corpus:
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = []
 
-	def __init__(self):
-		self.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,11,12]])
+	def __init__(self, corpusfile=None):
+
+		if corpusfile:
+			utterances, boundaries = utils.load_segmented_corpus(corpusfile)
+			self.initialize_lexicon(utterances, boundaries)
 
 	def initialize_lexicon(self, utterances, boundaries):
 
@@ -69,10 +72,15 @@ class segmented_corpus:
 			self.total_word_count += times
 
 
-
-
 	def initialize_boundaries_randomly():
+		#TODO: Implement like function below
 		pass
+
+	def remove_all_boundaries(self):
+		utterances = self.utterances
+		boundaries = [[] for _ in range(len(utterances))]
+		self.initialize_lexicon(utterances, boundaries)
+		
 
 
 	def P0(self, word):
@@ -219,12 +227,32 @@ class segmented_corpus:
 		return delimiter.join(segmented_corpus.split_utterance(utterance, boundaries))
 
 
-s = segmented_corpus()
-s.gibs_sampler((1,1) )
-s.gibs_sampler((1,2) )
-s.gibs_sampler((1,3) )
-s.gibs_sampler((1,5) )
-s.gibs_sampler((1,6) )
-s.gibs_sampler((3,11) )
-s.gibs_sampler((3,13) )
-s.gibs_sampler()
+
+### DEMO CODE ###
+def gibbs_demo():
+	s = segmented_corpus()
+	s.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,11,12]])
+	s.gibs_sampler((1,1) )
+	s.gibs_sampler((1,2) )
+	s.gibs_sampler((1,3) )
+	s.gibs_sampler((1,5) )
+	s.gibs_sampler((1,6) )
+	s.gibs_sampler((3,11) )
+	s.gibs_sampler((3,13) )
+	s.gibs_sampler()
+
+def boundary_reset_test():
+	s = segmented_corpus('br-phono-toy.txt')
+	s.gibs_sampler((1,1) )
+	s.remove_all_boundaries()
+	s.gibs_sampler((1,1) )
+
+def main():
+	gibbs_demo()
+	boundary_reset_test()
+
+if __name__ == '__main__':
+	main()
+
+
+
