@@ -1,5 +1,6 @@
 from collections import Counter
 from random import random
+from iProgressBar import ProgressBar
 import numpy as np
 import utils
 
@@ -49,7 +50,6 @@ class segmented_corpus:
 			self.total_word_count += len(words)
 
 
-
 	def substract_word_count(self, word_or_words, times = 1):
 		"""
 		Substract counts of a word, or a list of word from the counter, ensuring nonnegative values and updating the total count
@@ -91,7 +91,16 @@ class segmented_corpus:
 		return self.p_dash * ((self.p_dash)**(M-1) ) * (Pphoneme ** M)
 
 
-	def gibs_sampler(self, debug=None):
+	def gibbs_sampler(self, iterations=1, debug=None):
+
+		p = ProgressBar(iterations)
+
+		for i in range(iterations):
+			self.gibbs_sample_once(debug)
+			p.animate()
+
+
+	def gibbs_sample_once(self, debug=None):
 
 		#import parameters:
 		alpha0 = self.alpha0
@@ -232,24 +241,37 @@ class segmented_corpus:
 def gibbs_demo():
 	s = segmented_corpus()
 	s.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,11,12]])
-	s.gibs_sampler((1,1) )
-	s.gibs_sampler((1,2) )
-	s.gibs_sampler((1,3) )
-	s.gibs_sampler((1,5) )
-	s.gibs_sampler((1,6) )
-	s.gibs_sampler((3,11) )
-	s.gibs_sampler((3,13) )
-	s.gibs_sampler()
+	s.gibbs_sample_once((1,1) )
+	s.gibbs_sample_once((1,2) )
+	s.gibbs_sample_once((1,3) )
+	s.gibbs_sample_once((1,5) )
+	s.gibbs_sample_once((1,6) )
+	s.gibbs_sample_once((3,11) )
+	s.gibbs_sample_once((3,13) )
+	s.gibbs_sample_once()
 
 def boundary_reset_test():
 	s = segmented_corpus('br-phono-toy.txt')
-	s.gibs_sampler((1,1) )
+	s.gibbs_sample_once((1,1) )
 	s.remove_all_boundaries()
-	s.gibs_sampler((1,1) )
+	s.gibbs_sample_once((1,1) )
+
+def gibbs_test():
+	s = segmented_corpus('br-phono-toy.txt')
+	s.remove_all_boundaries()
+	s.gibbs_sampler(200000)
+
+	#just to show the results
+	s.gibbs_sample_once((0,1) )
+	s.gibbs_sample_once((1,1) )
+	s.gibbs_sample_once((2,1) )
+	s.gibbs_sample_once((3,1) )
+
 
 def main():
 	gibbs_demo()
 	boundary_reset_test()
+	gibbs_test()
 
 if __name__ == '__main__':
 	main()
