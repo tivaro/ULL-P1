@@ -14,10 +14,8 @@ class segmented_corpus:
 	utterances = [] #list of utterances (unseparated)
 	boundaries = [] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
 
-
-
 	#list of tuples (utterance_id, boundary_id) used for sampling
-	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
+	sample_list = []
 
 	def __init__(self):
 		self.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,11,12]])
@@ -28,7 +26,10 @@ class segmented_corpus:
 		self.utterances = utterances
 		self.boundaries = boundaries
 
-		#now update the statistics
+		#update the sample list
+		self.sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]	
+
+		#finally update the statistics
 		self.word_counts      = Counter()
 		self.total_word_count = 0
 
@@ -36,6 +37,8 @@ class segmented_corpus:
 			words = segmented_corpus.split_utterance(utterance, ut_boundaries)
 			self.word_counts += Counter(words)
 			self.total_word_count += len(words)
+
+
 
 	def substract_word_count(self, word_or_words, times = 1):
 		"""
@@ -77,7 +80,7 @@ class segmented_corpus:
 	def gibs_sampler(self, debug=None):
 
 		#parameters:
-		#temperature = 1 #temperature (annealing)
+		temperature = 1 #temperature (annealing)
 		alpha0 = 20 #dirichlet concentration
 		rho = 2 #parameter of beta prior over utterance end
 		#p# = 0.5
@@ -127,6 +130,10 @@ class segmented_corpus:
 						(1.0 * (nw3 + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
 						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
+		# Modify probabilities using annealing
+		p_boundary    = p_boundary**(1.0 / temperature)
+		p_no_boundary = p_no_boundary**(1.0 / temperature)
+
 		#sample proportionally
 		mu = p_boundary / (p_boundary + p_no_boundary)
 		insert_boundary = mu > random()
@@ -141,8 +148,8 @@ class segmented_corpus:
 
 			if insert_boundary:
 				
-				print "Insertamos"
-				print self.boundaries[u], self.total_word_count
+				if debug: print "Insertamos"
+				if debug: print self.boundaries[u], self.total_word_count
 
 				# Insert boundary
 				self.boundaries[u].insert(insert_boundary_at,boundary)
@@ -151,11 +158,11 @@ class segmented_corpus:
 				self.substract_word_count(w1)
 				self.add_word_count([w2, w3])
 
-				print self.boundaries[u], self.total_word_count
+				if debug: print self.boundaries[u], self.total_word_count
 
 			else:
-				print "Eliminamos"
-				print self.boundaries[u], self.total_word_count
+				if debug: print "Eliminamos"
+				if debug: print self.boundaries[u], self.total_word_count
 
 				# Remove boundary
 				self.boundaries[u].pop(insert_boundary_at)
@@ -164,7 +171,7 @@ class segmented_corpus:
 				self.substract_word_count([w2, w3])
 				self.add_word_count(w1)
 
-				print self.boundaries[u], self.total_word_count	
+				if debug: print self.boundaries[u], self.total_word_count	
 
 
 	@staticmethod
@@ -217,3 +224,4 @@ s.gibs_sampler((1,5) )
 s.gibs_sampler((1,6) )
 s.gibs_sampler((3,11) )
 s.gibs_sampler((3,13) )
+s.gibs_sampler()
