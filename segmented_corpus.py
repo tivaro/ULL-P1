@@ -20,7 +20,7 @@ class segmented_corpus:
 	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
 
 	def __init__(self):
-		self.initialize_lexicon(['hoihoeishet','watisdit','isditleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,13]])
+		self.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,13]])
 
 	def initialize_lexicon(self, utterances, boundaries):
 
@@ -111,17 +111,13 @@ class segmented_corpus:
 						(1.0 * (nw3 + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
 						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
-		if debug:
-			print 'p( B):', p_boundary
-			print 'p(-B):', p_no_boundary
-
 		#sample proportionally
 		mu = p_boundary / (p_boundary + p_no_boundary)
-		print mu
-		if mu > 0.5:
-			print 'BOUNDARY!'
-		else:
-			print 'NOPE'
+
+		if debug:
+			print 'p( B):', p_boundary, '*' * int(mu >= 0.5) 
+			print 'p(-B):', p_no_boundary, '*' * int(mu <= 0.5)
+
 
 
 
