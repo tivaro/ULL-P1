@@ -20,7 +20,7 @@ class segmented_corpus:
 	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
 
 	def __init__(self):
-		self.initialize_lexicon(['hoihoeishet','watisdit','isditleuk'], [[3,6,8],[2,5],[2,5,7]])
+		self.initialize_lexicon(['hoihoeishet','watisdit','isditleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,13]])
 
 	def initialize_lexicon(self, utterances, boundaries):
 
@@ -52,7 +52,7 @@ class segmented_corpus:
 		M = len(word)
 		#right now let's use a uniform phoneme distribution
 		#TODO: look this up and find a sensible value!
-		Pphoneme = 1.0 / 26
+		Pphoneme = 1.0 / 30
 		return p_dash * ((p_dash)**(M-1) ) * (Pphoneme ** M)
 
 
@@ -103,16 +103,26 @@ class segmented_corpus:
 		n_utter_ends = len(self.utterances) - int(utterance_final)
 		nu = n_utter_ends if utterance_final else n_total - n_utter_ends
 
-		p_boundary 	  =	(1.0* (nw1 + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
-						(1.0 *(nu + (rho/2)) / (n_total + rho))
+		p_no_boundary = (1.0 * (nw1 + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
+						(1.0 * (nu + (rho/2)) / (n_total + rho))
 
-		p_no_boundary =	(1.0 * (nw2 + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
+		p_boundary =	(1.0 * (nw2 + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
 						(1.0 * (n_total - n_utter_ends+ (rho/2)) / (n_total + rho) ) * \
 						(1.0 * (nw3 + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
 						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
-		print 'p( B):', p_boundary
-		print 'p(-B):', p_no_boundary
+		if debug:
+			print 'p( B):', p_boundary
+			print 'p(-B):', p_no_boundary
+
+		#sample proportionally
+		mu = p_boundary / (p_boundary + p_no_boundary)
+		print mu
+		if mu > 0.5:
+			print 'BOUNDARY!'
+		else:
+			print 'NOPE'
+
 
 
 		#print p_boundary
