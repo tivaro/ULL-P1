@@ -8,6 +8,13 @@ class segmented_corpus:
 
 	"""
 
+	#parameters
+	alpha0 = 20 #dirichlet concentration
+	temperature = 1 #temperature for gibbs sampling (annealing)
+	rho = 2 #parameter of beta prior over utterance end
+	p_dash = 0.5 #probability of ending a word (in P_0)
+
+
 	word_counts		 = Counter() #other word counts
 	total_word_count = 0
 
@@ -69,22 +76,18 @@ class segmented_corpus:
 
 
 	def P0(self, word):
-		p_dash = 0.5
 		M = len(word)
 		#right now let's use a uniform phoneme distribution
 		#TODO: look this up and find a sensible value!
 		Pphoneme = 1.0 / 30
-		return p_dash * ((p_dash)**(M-1) ) * (Pphoneme ** M)
+		return self.p_dash * ((self.p_dash)**(M-1) ) * (Pphoneme ** M)
 
 
 	def gibs_sampler(self, debug=None):
 
-		#parameters:
-		temperature = 1 #temperature (annealing)
-		alpha0 = 20 #dirichlet concentration
-		rho = 2 #parameter of beta prior over utterance end
-		#p# = 0.5
-
+		#import parameters:
+		alpha0 = self.alpha0
+		rho    = self.rho
 
 		#Randomly draw boundary location
 		u, boundary = debug or self.sample_list[np.random.randint(len(self.sample_list))]
@@ -131,8 +134,8 @@ class segmented_corpus:
 						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
 		# Modify probabilities using annealing
-		p_boundary    = p_boundary**(1.0 / temperature)
-		p_no_boundary = p_no_boundary**(1.0 / temperature)
+		p_boundary    = p_boundary**(1.0 / self.temperature)
+		p_no_boundary = p_no_boundary**(1.0 / self.temperature)
 
 		#sample proportionally
 		mu = p_boundary / (p_boundary + p_no_boundary)
