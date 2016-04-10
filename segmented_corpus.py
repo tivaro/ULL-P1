@@ -1,4 +1,5 @@
 from collections import Counter
+from random import random
 import numpy as np
 import utils
 
@@ -8,7 +9,6 @@ class segmented_corpus:
 	"""
 
 	word_counts		 = Counter() #other word counts
-	boundary_count   = 0
 	total_word_count = 0
 
 	utterances = [] #list of utterances (unseparated)
@@ -20,7 +20,7 @@ class segmented_corpus:
 	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
 
 	def __init__(self):
-		self.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,13]])
+		self.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,11,12]])
 
 	def initialize_lexicon(self, utterances, boundaries):
 
@@ -30,7 +30,6 @@ class segmented_corpus:
 
 		#now update the statistics
 		self.word_counts      = Counter()
-		self.boundary_count   = 0
 		self.total_word_count = 0
 
 		for utterance, ut_boundaries in zip(utterances, boundaries):
@@ -38,8 +37,27 @@ class segmented_corpus:
 			self.word_counts += Counter(words)
 			self.total_word_count += len(words)
 
-		#use the fact that each utterance has words -1 boundaries
-		self.boundary_count   = self.total_word_count - len(self.utterances)
+	def substract_word_count(self, word_or_words, times = 1):
+		"""
+		Substract counts of a word, or a list of word from the counter, ensuring nonnegative values and updating the total count
+		"""
+		if isinstance(word_or_words, list):
+			[self.substract_word_count(word, times) for word in word_or_words]
+		else:
+			self.total_word_count -= self.word_counts[word_or_words]
+			self.word_counts[word_or_words] = max(self.word_counts[word_or_words] - times, 0)
+			self.total_word_count += self.word_counts[word_or_words]
+
+	def add_word_count(self, word_or_words, times = 1):
+		"""
+		Substract counts of a word, or a list of word from the counter, updating the total count
+		"""
+		if isinstance(word_or_words, list):
+			[self.add_word_count(word, times) for word in word_or_words]
+		else:
+			self.word_counts[word_or_words] += times
+			self.total_word_count += times
+
 
 
 
@@ -83,8 +101,6 @@ class segmented_corpus:
 		if debug:
 			print "     " + " " * (boundary - 1 + insert_boundary_at - boundary_exists) + 'V' + ' ' * int(boundary_exists) + 'V'
 			print "utt: " + segmented_corpus.insert_boundaries(utterance, boundaries)
-			boundaries.insert(insert_boundary_at, boundary)
-			boundaries.pop(insert_boundary_at)
 			print "w1: " + w1
 			print "w2: " + w2
 			print "w3: " + w3
@@ -113,41 +129,42 @@ class segmented_corpus:
 
 		#sample proportionally
 		mu = p_boundary / (p_boundary + p_no_boundary)
+		insert_boundary = mu > random()
 
 		if debug:
-			print 'p( B):', p_boundary, '*' * int(mu >= 0.5) 
-			print 'p(-B):', p_no_boundary, '*' * int(mu <= 0.5)
+			print 'p( B):', p_boundary, '*' * int(insert_boundary) 
+			print 'p(-B):', p_no_boundary, '*' * int(not insert_boundary)
+			print ' (mu=', mu, ')'
 
+		if insert_boundary != boundary_exists:
+			# we have to update the boundary and the counts
 
+			if insert_boundary:
+				
+				print "Insertamos"
+				print self.boundaries[u], self.total_word_count
 
+				# Insert boundary
+				self.boundaries[u].insert(insert_boundary_at,boundary)
+				
+				# Update counts
+				self.substract_word_count(w1)
+				self.add_word_count([w2, w3])
 
-		#print p_boundary
+				print self.boundaries[u], self.total_word_count
 
+			else:
+				print "Eliminamos"
+				print self.boundaries[u], self.total_word_count
 
-		#calculate P1
-		#git commit -m "Implemented gibbs sampling untill finding the two words corresponding to both hypotheses"
+				# Remove boundary
+				self.boundaries[u].pop(insert_boundary_at)
 
-		#calculate P2
+				# Update counts
+				self.substract_word_count([w2, w3])
+				self.add_word_count(w1)
 
-		#sample proportionally
-
-		#if changed:
-			#update counts
-		#	if word is utterance end:
-				#put in words_$
-		#	else:
-				#put in words_u
-
-			#update boundary (and boundary_count)
-
-
-		#Hypothesis 2: A  boundary: split words w2 and w3
-
-		# h- : all words in the corpus except w1, w2 and w3
-
-		#w1 in h- + alpha0 * P(w1)   #nu in h- + rho/2
-		#------------------------  x ------------------
-	#        total(h-)            total(h-) + tau
+				print self.boundaries[u], self.total_word_count	
 
 
 	@staticmethod
@@ -175,6 +192,9 @@ class segmented_corpus:
 				insert_entry = n
 				break
 
+		#insert_entry should equal the next element if entry does not exit, but it's true location if entry exists
+		insert_entry -= int(entry_exists)		
+
 		if full_description:
 			return prev_neighbour, next_neighbour, entry_exists, insert_entry
 		else:
@@ -195,3 +215,5 @@ s.gibs_sampler((1,2) )
 s.gibs_sampler((1,3) )
 s.gibs_sampler((1,5) )
 s.gibs_sampler((1,6) )
+s.gibs_sampler((3,11) )
+s.gibs_sampler((3,13) )
