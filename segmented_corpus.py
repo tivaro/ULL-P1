@@ -7,16 +7,15 @@ class segmented_corpus:
 
 	"""
 
-	final_words		= Counter(['het','dit']) #word counts at utterance boundary
-	utter_words		= Counter(['hoi','hoe','is','wa','tis','dit']) #other word counts
-	boundary_count  = 0
-	word_count      = 0
+	word_counts		 = Counter(['hoi','hoe','is','wa','tis','dit','het','dit']) #other word counts
+	boundary_count   = 0
+	total_word_count = 0
 
 	utterances = ['hoihoeishet','watisdit'] #list of utterances (unseparated)
 	boundaries = [[3,6,8],[2,5]] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
 
-	boundary_count = sum([len(b) for b in boundaries])
-	word_count     = boundary_count + len(utterances)
+	boundary_count 	 = sum([len(b) for b in boundaries])
+	total_word_count = boundary_count + len(utterances)
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
@@ -73,29 +72,22 @@ class segmented_corpus:
 		# this means that we should substract the counts for the part under consideration (w1)
 		# if the boundary exists, thrn we need to substract 2 words (w2 and w3 are in there right now)
 		# if the boundary does not exist, then we neet to substract 1 word (w1 is in there now)
-		n_total   = max(self.word_count - 1 - int(boundary_exists), 0)
+		n_total   = max(self.total_word_count - 1 - int(boundary_exists), 0)
 
-		nw1_final = max(self.final_words[w1] - int(not boundary_exists), 0)
-		nw1_utter = max(self.utter_words[w1] - int(not boundary_exists), 0)
-		nw1_total = nw1_final + nw1_utter
+		nw1 = max(self.word_counts[w1] - int(not boundary_exists), 0)
+		nw2 = max(self.word_counts[w2] - int(boundary_exists), 0)
+		nw3 = max(self.word_counts[w3] - int(boundary_exists), 0)
 
-		nw2_final = max(self.final_words[w2] - int(boundary_exists), 0)
-		nw2_utter = max(self.utter_words[w2] - int(boundary_exists), 0)
-		nw2_total = nw2_final + nw2_utter
-
-		nw3_final = max(self.final_words[w3] - int(boundary_exists), 0)
-		nw3_utter = max(self.utter_words[w3] - int(boundary_exists), 0)
-		nw3_total = nw3_final + nw3_utter
 
 		n_utter_ends = len(self.utterances) - int(utterance_final)
 		nu = n_utter_ends if utterance_final else n_total - n_utter_ends
 
-		p_boundary 	  =	(1.0* (nw1_total + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
+		p_boundary 	  =	(1.0* (nw1 + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
 						(1.0 *(nu + (rho/2)) / (n_total + rho))
 
-		p_no_boundary =	(1.0 * (nw2_total + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
+		p_no_boundary =	(1.0 * (nw2 + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
 						(1.0 * (n_total - n_utter_ends+ (rho/2)) / (n_total + rho) ) * \
-						(1.0 * (nw3_total + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
+						(1.0 * (nw3 + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
 						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
 		print 'p( B):', p_boundary
