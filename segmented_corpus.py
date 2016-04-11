@@ -338,7 +338,7 @@ def gibbs_log_demo():
 	import matplotlib.pyplot as plt
 	s = segmented_corpus('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	logPs = s.gibbs_sampler(50000, True)
+	logPs = s.gibbs_sampler(True)
 	plt.ylabel('Joint log probability')
 	plt.xlabel('Iteration')
 	plt.plot(logPs)
