@@ -11,6 +11,7 @@ class segmented_corpus:
 
 	#parameters
 	alpha0 = 20 #dirichlet concentration
+	temp_regime = (20000, np.arange(0.1,1.1,0.1))
 	temperature = 1 #temperature for gibbs sampling (annealing)
 	rho = 2 #parameter of beta prior over utterance end
 	p_dash = 0.5 #probability of ending a word (in P_0)
@@ -25,11 +26,27 @@ class segmented_corpus:
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = []
 
-	def __init__(self, corpusfile=None):
+	def __init__(self, corpusfile=None, temp_regime_id=0):
 
 		if corpusfile:
 			utterances, boundaries = utils.load_segmented_corpus(corpusfile)
 			self.initialize_lexicon(utterances, boundaries)
+
+		#temp_regimes decides the amount of iterations and the temperature regime
+		temp_regimes = []
+		temp_regimes.append([20000, np.arange(0.1,1.1,0.1)])
+		temp_regimes.append([40000, np.arange(0.002,1.002,0.002)])
+		self.temp_regime = temp_regimes[temp_regime_id]
+		#compute the time steps when we have to change temperatures
+		self.temp_regime.append(int(self.temp_regime[0]/len(self.temp_regime[1])))
+		self.temp_regime = tuple(self.temp_regime)
+		print(self.temp_regime)
+		"""
+		for example:
+		iterations = 20000
+		len(steps) = 10
+		iterations/len(steps) = 2000
+		"""
 
 	def initialize_lexicon(self, utterances, boundaries):
 
@@ -93,7 +110,6 @@ class segmented_corpus:
 		Pphoneme = 1.0 / 30
 		return self.p_dash * ((self.p_dash)**(M-1) ) * (Pphoneme ** M)
 
-
 	def P_corpus(self):
 		"""
 		Returns the joint probability of all words in the corpus
@@ -106,13 +122,16 @@ class segmented_corpus:
 		return sum(np.log(pws))
 
 
-	def gibbs_sampler(self, iterations=1, log_P_corpus=False, debug=None):
+	def gibbs_sampler(self, log_P_corpus=False, debug=None):
 
+		iterations, temp_steps, step_size = self.temp_regime
 		p = ProgressBar(iterations)
 
 		P_corpus_log = []
 
 		for i in range(iterations):
+			if i%step_size == 0:
+				self.temperature = 1/temp_steps[i/step_size]
 			self.gibbs_sample_once(debug)
 			if log_P_corpus: P_corpus_log.append(self.P_corpus())
 			p.animate()
@@ -279,7 +298,7 @@ def boundary_reset_test():
 def gibbs_test():
 	s = segmented_corpus('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	s.gibbs_sampler(5000)
+	s.gibbs_sampler()
 
 	#just to show the results
 	s.gibbs_sample_once((0,1) )
@@ -310,8 +329,8 @@ def gibbs_log_demo():
 
 
 def main():
-	gibbs_demo()
-	boundary_reset_test()
+	#gibbs_demo()
+	#boundary_reset_test()
 	gibbs_test()
 	joint_prop_test()
 	gibbs_log_demo()
