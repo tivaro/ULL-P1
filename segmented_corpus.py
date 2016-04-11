@@ -63,7 +63,10 @@ class segmented_corpus:
 			[self.substract_word_count(word, times) for word in word_or_words]
 		else:
 			self.total_word_count -= self.word_counts[word_or_words]
-			self.word_counts[word_or_words] = max(self.word_counts[word_or_words] - times, 0)
+			if self.word_counts[word_or_words] - times > 0:
+				self.word_counts[word_or_words] -= times
+			else:
+				del self.word_counts[word_or_words]
 			self.total_word_count += self.word_counts[word_or_words]
 
 	def add_word_count(self, word_or_words, times = 1):
@@ -96,13 +99,30 @@ class segmented_corpus:
 		return self.p_dash * ((self.p_dash)**(M-1) ) * (Pphoneme ** M)
 
 
-	def gibbs_sampler(self, iterations=1, debug=None):
+	def P_corpus(self):
+		"""
+		Returns the joint probability of all words in the corpus
+		(in log probability)
+		"""
+
+		pws = [ (1.0 * (count - 1 + self.alpha0 * self.P0(word)) / (self.total_word_count - 1 + self.alpha0))
+						for word, count in self.word_counts.iteritems()]
+
+		return sum(np.log(pws))
+
+
+	def gibbs_sampler(self, iterations=1, log_P_corpus=False, debug=None):
 
 		p = ProgressBar(iterations)
 
+		P_corpus_log = []
+
 		for i in range(iterations):
 			self.gibbs_sample_once(debug)
+			if log_P_corpus: P_corpus_log.append(self.P_corpus())
 			p.animate()
+
+		if log_P_corpus: return P_corpus_log
 
 
 	def gibbs_sample_once(self, debug=None):
@@ -274,7 +294,7 @@ def boundary_reset_test():
 def gibbs_test():
 	s = segmented_corpus('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	s.gibbs_sampler(200000)
+	s.gibbs_sampler(5000)
 
 	#just to show the results
 	s.gibbs_sample_once((0,1) )
@@ -284,11 +304,34 @@ def gibbs_test():
 
 	s.eval()
 
+def joint_prop_test():
+	s = segmented_corpus('br-phono-toy.txt')
+	print s.P_corpus()
+	s.remove_all_boundaries()
+	print s.P_corpus()
+	s.gibbs_sampler(5000)
+	print s.P_corpus()
+
+def gibbs_log_demo():
+	"""
+	Shows the effect of gibs sampling iterations
+	"""
+	import matplotlib.pyplot as plt
+	s = segmented_corpus('br-phono-toy.txt')
+	s.remove_all_boundaries()
+	logPs = s.gibbs_sampler(50000, True)
+	plt.ylabel('Joint log probability')
+	plt.xlabel('Iteration')
+	plt.plot(logPs)
+	plt.show()
+
 
 def main():
 	gibbs_demo()
 	boundary_reset_test()
 	gibbs_test()
+	joint_prop_test()
+	gibbs_log_demo()
 
 if __name__ == '__main__':
 	main()
