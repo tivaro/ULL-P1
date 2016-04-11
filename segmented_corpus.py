@@ -18,9 +18,11 @@ class segmented_corpus:
 
 	word_counts		 = Counter() #other word counts
 	total_word_count = 0
+	original_word_counts = Counter()
 
 	utterances = [] #list of utterances (unseparated)
 	boundaries = [] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
+	original_boundaries = [] # for evaluation purposes
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = []
@@ -31,6 +33,9 @@ class segmented_corpus:
 			utterances, boundaries = utils.load_segmented_corpus(corpusfile)
 			self.initialize_lexicon(utterances, boundaries)
 
+			self.original_boundaries = self.boundaries[:]
+			self.original_word_counts = self.word_counts.copy()
+
 	def initialize_lexicon(self, utterances, boundaries):
 
 		#first store the utterances an boundaries
@@ -38,7 +43,7 @@ class segmented_corpus:
 		self.boundaries = boundaries
 
 		#update the sample list
-		self.sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]	
+		self.sample_list = [(u,b) for u, utterance in enumerate(utterances) for b in range(1, len(utterance) )]
 
 		#finally update the statistics
 		self.word_counts      = Counter()
@@ -80,7 +85,7 @@ class segmented_corpus:
 		utterances = self.utterances
 		boundaries = [[] for _ in range(len(utterances))]
 		self.initialize_lexicon(utterances, boundaries)
-		
+
 
 
 	def P0(self, word):
@@ -116,7 +121,7 @@ class segmented_corpus:
 		prev_b = prev_b or 0
 		utterance_final = not next_b
 
-		#find start, end 
+		#find start, end
 		w1 = utterance[prev_b:next_b]
 		w2 = w1[:boundary-prev_b]
 		w3 = w1[boundary-prev_b:]
@@ -159,7 +164,7 @@ class segmented_corpus:
 		insert_boundary = mu > random()
 
 		if debug:
-			print 'p( B):', p_boundary, '*' * int(insert_boundary) 
+			print 'p( B):', p_boundary, '*' * int(insert_boundary)
 			print 'p(-B):', p_no_boundary, '*' * int(not insert_boundary)
 			print ' (mu=', mu, ')'
 
@@ -167,13 +172,13 @@ class segmented_corpus:
 			# we have to update the boundary and the counts
 
 			if insert_boundary:
-				
+
 				if debug: print "Insertamos"
 				if debug: print self.boundaries[u], self.total_word_count
 
 				# Insert boundary
 				self.boundaries[u].insert(insert_boundary_at,boundary)
-				
+
 				# Update counts
 				self.substract_word_count(w1)
 				self.add_word_count([w2, w3])
@@ -191,8 +196,18 @@ class segmented_corpus:
 				self.substract_word_count([w2, w3])
 				self.add_word_count(w1)
 
-				if debug: print self.boundaries[u], self.total_word_count	
+				if debug: print self.boundaries[u], self.total_word_count
 
+
+	def eval(self):
+		words = utils.eval_words(self.boundaries, self.original_boundaries)
+		boundaries = utils.eval_boundaries(self.boundaries, self.original_boundaries)
+		lexicon = utils.eval_lexicon(self.word_counts, self.original_word_counts)
+
+		print '=== Evaluation ========================'
+		print 'Pw = %.3f, Rw = %.3f, Fw = %.3f' % words
+		print 'Pb = %.3f, Rb = %.3f, Fb = %.3f' % boundaries
+		print 'Pl = %.3f, Rl = %.3f, Fl = %.3f' % lexicon
 
 	@staticmethod
 	def neighbours(sorted_list, entry, full_description = True):
@@ -209,7 +224,7 @@ class segmented_corpus:
 
 
 		for n,e in enumerate(sorted_list):
-			
+
 			if e < entry:
 				prev_neighbour = e
 			elif e == entry:
@@ -220,7 +235,7 @@ class segmented_corpus:
 				break
 
 		#insert_entry should equal the next element if entry does not exit, but it's true location if entry exists
-		insert_entry -= int(entry_exists)		
+		insert_entry -= int(entry_exists)
 
 		if full_description:
 			return prev_neighbour, next_neighbour, entry_exists, insert_entry
@@ -266,6 +281,8 @@ def gibbs_test():
 	s.gibbs_sample_once((1,1) )
 	s.gibbs_sample_once((2,1) )
 	s.gibbs_sample_once((3,1) )
+
+	s.eval()
 
 
 def main():
