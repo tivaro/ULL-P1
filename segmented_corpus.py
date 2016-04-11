@@ -106,13 +106,18 @@ class segmented_corpus:
 		return sum(np.log(pws))
 
 
-	def gibbs_sampler(self, iterations=1, debug=None):
+	def gibbs_sampler(self, iterations=1, log_P_corpus=False, debug=None):
 
 		p = ProgressBar(iterations)
 
+		P_corpus_log = []
+
 		for i in range(iterations):
 			self.gibbs_sample_once(debug)
+			if log_P_corpus: P_corpus_log.append(self.P_corpus())
 			p.animate()
+
+		if log_P_corpus: return P_corpus_log
 
 
 	def gibbs_sample_once(self, debug=None):
@@ -290,6 +295,18 @@ def joint_prop_test():
 	s.gibbs_sampler(5000)
 	print s.P_corpus()
 
+def gibbs_log_demo():
+	"""
+	Shows the effect of gibs sampling iterations
+	"""
+	import matplotlib.pyplot as plt
+	s = segmented_corpus('br-phono-toy.txt')
+	s.remove_all_boundaries()
+	logPs = s.gibbs_sampler(50000, True)
+	plt.ylabel('Joint log probability')
+	plt.xlabel('Iteration')
+	plt.plot(logPs)
+	plt.show()
 
 
 def main():
@@ -297,6 +314,7 @@ def main():
 	boundary_reset_test()
 	gibbs_test()
 	joint_prop_test()
+	gibbs_log_demo()
 
 if __name__ == '__main__':
 	main()
