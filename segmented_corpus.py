@@ -58,7 +58,10 @@ class segmented_corpus:
 			[self.substract_word_count(word, times) for word in word_or_words]
 		else:
 			self.total_word_count -= self.word_counts[word_or_words]
-			self.word_counts[word_or_words] = max(self.word_counts[word_or_words] - times, 0)
+			if self.word_counts[word_or_words] - times > 0:
+				self.word_counts[word_or_words] -= times
+			else:
+				del self.word_counts[word_or_words]
 			self.total_word_count += self.word_counts[word_or_words]
 
 	def add_word_count(self, word_or_words, times = 1):
@@ -89,6 +92,18 @@ class segmented_corpus:
 		#TODO: look this up and find a sensible value!
 		Pphoneme = 1.0 / 30
 		return self.p_dash * ((self.p_dash)**(M-1) ) * (Pphoneme ** M)
+
+
+	def P_corpus(self):
+		"""
+		Returns the joint probability of all words in the corpus
+		(in log probability)
+		"""
+
+		pws = [ (1.0 * (count - 1 + self.alpha0 * self.P0(word)) / (self.total_word_count - 1 + self.alpha0))
+						for word, count in self.word_counts.iteritems()]
+
+		return sum(np.log(pws))
 
 
 	def gibbs_sampler(self, iterations=1, debug=None):
@@ -259,7 +274,7 @@ def boundary_reset_test():
 def gibbs_test():
 	s = segmented_corpus('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	s.gibbs_sampler(200000)
+	s.gibbs_sampler(5000)
 
 	#just to show the results
 	s.gibbs_sample_once((0,1) )
@@ -267,11 +282,21 @@ def gibbs_test():
 	s.gibbs_sample_once((2,1) )
 	s.gibbs_sample_once((3,1) )
 
+def joint_prop_test():
+	s = segmented_corpus('br-phono-toy.txt')
+	print s.P_corpus()
+	s.remove_all_boundaries()
+	print s.P_corpus()
+	s.gibbs_sampler(5000)
+	print s.P_corpus()
+
+
 
 def main():
 	gibbs_demo()
 	boundary_reset_test()
 	gibbs_test()
+	joint_prop_test()
 
 if __name__ == '__main__':
 	main()
