@@ -344,13 +344,22 @@ def gibbs_log_demo():
 	plt.plot(logPs)
 	plt.show()
 
+def eval_demo():
+	s = segmented_corpus('br-phono-toy.txt')
+	s.eval()
+	s.remove_all_boundaries()
+	s.eval()
+	s.gibbs_sampler(10000)
+	s.eval()
+
 
 def main():
 	#gibbs_demo()
 	#boundary_reset_test()
-	gibbs_test()
-	joint_prop_test()
-	gibbs_log_demo()
+	#gibbs_test()
+	#joint_prop_test()
+	#gibbs_log_demo()
+	eval_demo()
 
 if __name__ == '__main__':
 	main()
