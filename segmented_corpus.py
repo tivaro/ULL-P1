@@ -11,19 +11,20 @@ class segmented_corpus:
 
 	#parameters
 	alpha0 = 20 #dirichlet concentration
-	temp_regime = (20000, np.arange(0.1,1.1,0.1))
-	temperature = 1 #temperature for gibbs sampling (annealing)
+	temp_regime = (20000, np.arange(0.1,1.1,0.1)) #temperature steps for gibbs sampling (annealing) in a tuple (total_iterations, regime)
 	rho = 2 #parameter of beta prior over utterance end
 	p_dash = 0.5 #probability of ending a word (in P_0)
 
 
 	word_counts		 = Counter() #other word counts
 	total_word_count = 0
-	original_word_counts = Counter()
 
 	utterances = [] #list of utterances (unseparated)
 	boundaries = [] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
-	original_boundaries = [] # for evaluation purposes
+
+	# for evaluation purposes
+	original_word_counts = Counter()
+	original_boundaries = [] 
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = []
@@ -147,24 +148,24 @@ class segmented_corpus:
 		for i in range(iterations):
 
 			#update temperature
-			if i%step_size == 0:
-				self.temperature = 1/temp_steps[i/step_size]
+			if i % step_size == 0:
+				temperature = 1/temp_steps[i/step_size]
 
 			#do one iteration and update progressbar
-			self.gibbs_sample_once(debug)
+			self.gibbs_sample_once(debug=debug, temperature=1)
 			p.animate(i)
 
 			#update log
 			if 'P_corpus'    in log: logs['P_corpus'].append( self.P_corpus())
 			if 'n_types'     in log: logs['n_types'].append( len(self.word_counts))
 			if 'n_tokens'    in log: logs['n_tokens'].append( self.total_word_count)
-			if 'temperature' in log: logs['temperature'].append( self.temperature)
+			if 'temperature' in log: logs['temperature'].append( temperature)
 
 
 		if log: return logs
 
 
-	def gibbs_sample_once(self, debug=None):
+	def gibbs_sample_once(self, temperature=1, debug=None):
 
 		#import parameters:
 		alpha0 = self.alpha0
@@ -219,8 +220,8 @@ class segmented_corpus:
 							(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
 			# Modify probabilities using annealing
-			p_boundary    = p_boundary**(1.0 / self.temperature)
-			p_no_boundary = p_no_boundary**(1.0 / self.temperature)
+			p_boundary    = p_boundary**(1.0 / temperature)
+			p_no_boundary = p_no_boundary**(1.0 / temperature)
 
 			#sample proportionally
 			mu = p_boundary / (p_boundary + p_no_boundary)
@@ -260,6 +261,8 @@ class segmented_corpus:
 					self.add_word_count(w1)
 
 					if debug: print self.boundaries[u], self.total_word_count
+
+
 
 
 	def eval(self):
