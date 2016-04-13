@@ -30,12 +30,14 @@ class segmented_corpus:
 
 	# for evaluation purposes
 	original_word_counts = Counter()
-	original_boundaries = [] 
+	original_boundaries = []
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = []
 
-	def __init__(self, corpusfile=None, temp_regime_id=0):
+	P0_method = None
+
+	def __init__(self, corpusfile=None, temp_regime_id=0, P0_method='uniform'):
 
 		if corpusfile:
 			utterances, boundaries = utils.load_segmented_corpus(corpusfile)
@@ -60,6 +62,8 @@ class segmented_corpus:
 		len(steps) = 10
 		iterations/len(steps) = 2000
 		"""
+
+		self.P0_method = P0_method # 'mle' or 'uniform'
 
 	def initialize_lexicon(self, utterances, boundaries):
 
@@ -144,7 +148,10 @@ class segmented_corpus:
 		self.initialize_lexicon(utterances, boundaries)
 
 	def P_phoneme(self, x):
-		return self.phoneme_counts[x] / float(self.total_phoneme_count)
+		if self.P0_method == 'mle':
+			return self.phoneme_counts[x] / float(self.total_phoneme_count)
+
+		return 1.0 / float(self.unique_phoneme_count)
 
 	def P0(self, word):
 		if word not in self.P0_cache:
@@ -390,7 +397,7 @@ def boundary_random_test():
 	s = segmented_corpus('br-phono-toy.txt')
 	s.gibbs_sample_once(debug=(1,1) )
 	s.initialize_boundaries_randomly()
-	s.gibbs_sample_once(debug=(1,1) )	
+	s.gibbs_sample_once(debug=(1,1) )
 
 def gibbs_test():
 	s = segmented_corpus('br-phono-toy.txt')
@@ -427,7 +434,7 @@ def gibbs_log_demo():
 
 	l1 = ax1.plot(logs['P_corpus'],'-r', label='joint probability')
 	ax1.set_ylabel('Joint log probability')
-	
+
 	ax2 = ax1.twinx()
 	l2 = ax2.plot(logs['n_types'], label='Types')
 	l3 = ax2.plot(logs['n_tokens'],label='Tokens')
