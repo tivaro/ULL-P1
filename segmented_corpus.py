@@ -4,26 +4,29 @@ from iProgressBar import ProgressBar
 import numpy as np
 import utils
 
+
 class segmented_corpus:
 	"""
 
 	"""
 
+	__version__ = 0.8
+
 	#parameters
 	alpha0 = 20 #dirichlet concentration
-	temp_regime = (20000, np.arange(0.1,1.1,0.1))
-	temperature = 1 #temperature for gibbs sampling (annealing)
+	temp_regime = (20000, np.arange(0.1,1.1,0.1)) #temperature steps for gibbs sampling (annealing) in a tuple (total_iterations, regime)
 	rho = 2 #parameter of beta prior over utterance end
 	p_dash = 0.5 #probability of ending a word (in P_0)
 
-
 	word_counts		 = Counter() #other word counts
 	total_word_count = 0
-	original_word_counts = Counter()
 
 	utterances = [] #list of utterances (unseparated)
 	boundaries = [] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
-	original_boundaries = [] # for evaluation purposes
+
+	# for evaluation purposes
+	original_word_counts = Counter()
+	original_boundaries = [] 
 
 	#list of tuples (utterance_id, boundary_id) used for sampling
 	sample_list = []
@@ -97,9 +100,29 @@ class segmented_corpus:
 			self.total_word_count += times
 
 
-	def initialize_boundaries_randomly():
-		#TODO: Implement like function below
-		pass
+	def initialize_boundaries_randomly(self, boudary_proportion=0.3):
+
+		#Remove all boundaries and import sample list, utternaces and boundaries
+		self.remove_all_boundaries()
+		sample_list = self.sample_list
+		boundaries  = self.boundaries
+		utterances = self.utterances
+
+		#randomly select the defined proportion of boundaries
+		boundary_ids = range(len(sample_list))
+		np.random.shuffle(boundary_ids)
+		to = int(round(len(sample_list) * boudary_proportion))
+		chosen_boundaries = boundary_ids[:to]
+
+		#sort the list again because the boundaries stored in the object have to be sorted.
+		chosen_boundaries.sort()
+
+		#append the chosen boundaries to the (now initialised empty boundary list)
+		[boundaries[sample_list[i][0]].append(sample_list[i][1]) for i in chosen_boundaries]
+
+		#reinitialise to set the right counts
+		self.initialize_lexicon(utterances, boundaries)
+
 
 	def remove_all_boundaries(self):
 		utterances = self.utterances
@@ -127,24 +150,44 @@ class segmented_corpus:
 		return sum(np.log(pws))
 
 
-	def gibbs_sampler(self, log_P_corpus=False, debug=None):
+	def gibbs_sampler(self, log=[], debug=None):
+		"""
+		Performs gibs sampling according to the iteration/temperature scheme in s.temp_regime
+		the variable log should be a list with values that should be logged after each iteration (the log is returned)
+		possible elements are:
+			'P_corpus': the probabilty of the entire corpus
+			'n_types': the lexicon size
+			'n_tokens': the number of tokens
+			'temperature': the temperature used at each iteration
+		"""
 
 		iterations, temp_steps, step_size = self.temp_regime
 		p = ProgressBar(iterations)
 
-		P_corpus_log = []
+		# initialize log
+		logs = {var:[] for var in log}
 
 		for i in range(iterations):
-			if i%step_size == 0:
-				self.temperature = 1/temp_steps[i/step_size]
-			self.gibbs_sample_once(debug)
-			if log_P_corpus: P_corpus_log.append(self.P_corpus())
-			p.animate()
 
-		if log_P_corpus: return P_corpus_log
+			#update temperature
+			if i % step_size == 0:
+				temperature = 1/temp_steps[i/step_size]
+
+			#do one iteration and update progressbar
+			self.gibbs_sample_once(debug=debug, temperature=1)
+			p.animate(i)
+
+			#update log
+			if 'P_corpus'    in log: logs['P_corpus'].append( self.P_corpus())
+			if 'n_types'     in log: logs['n_types'].append( len(self.word_counts))
+			if 'n_tokens'    in log: logs['n_tokens'].append( self.total_word_count)
+			if 'temperature' in log: logs['temperature'].append( temperature)
 
 
-	def gibbs_sample_once(self, debug=None):
+		if log: return logs
+
+
+	def gibbs_sample_once(self, temperature=1, debug=None):
 
 		#import parameters:
 		alpha0 = self.alpha0
@@ -199,8 +242,8 @@ class segmented_corpus:
 							(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
 			# Modify probabilities using annealing
-			p_boundary    = p_boundary**(1.0 / self.temperature)
-			p_no_boundary = p_no_boundary**(1.0 / self.temperature)
+			p_boundary    = p_boundary**(1.0 / temperature)
+			p_no_boundary = p_no_boundary**(1.0 / temperature)
 
 			#sample proportionally
 			mu = p_boundary / (p_boundary + p_no_boundary)
@@ -242,15 +285,27 @@ class segmented_corpus:
 					if debug: print self.boundaries[u], self.total_word_count
 
 
-	def eval(self):
+	def evaluate(self):
+		"""
+		Returns a dict of tuples (precicion, recall, F0) for:
+		'words',
+		'boundaries',
+		'lexicon'
+		"""
 		words = utils.eval_words(self.boundaries, self.original_boundaries)
 		boundaries = utils.eval_boundaries(self.boundaries, self.original_boundaries)
 		lexicon = utils.eval_lexicon(self.word_counts, self.original_word_counts)
 
+		return {'words': words, 'boundaries':boundaries, 'lexicon':lexicon}
+
+
+	def print_evaluation(self):
+		evaluation = self.evaluate()
+
 		print '=== Evaluation ========================'
-		print 'Pw = %.3f, Rw = %.3f, Fw = %.3f' % words
-		print 'Pb = %.3f, Rb = %.3f, Fb = %.3f' % boundaries
-		print 'Pl = %.3f, Rl = %.3f, Fl = %.3f' % lexicon
+		print 'Pw = %.3f, Rw = %.3f, Fw = %.3f' % evaluation['words']
+		print 'Pb = %.3f, Rb = %.3f, Fb = %.3f' % evaluation['boundaries']
+		print 'Pl = %.3f, Rl = %.3f, Fl = %.3f' % evaluation['lexicon']
 
 	@staticmethod
 	def neighbours(sorted_list, entry, full_description = True):
@@ -299,20 +354,26 @@ class segmented_corpus:
 def gibbs_demo():
 	s = segmented_corpus()
 	s.initialize_lexicon(['hoihoeishet','watisdit','ditisleuk','ditisditisditis'], [[3,6,8],[2,5],[2,5,7],[3,5,8,10,11,12]])
-	s.gibbs_sample_once((1,1) )
-	s.gibbs_sample_once((1,2) )
-	s.gibbs_sample_once((1,3) )
-	s.gibbs_sample_once((1,5) )
-	s.gibbs_sample_once((1,6) )
-	s.gibbs_sample_once((3,11) )
-	s.gibbs_sample_once((3,13) )
+	s.gibbs_sample_once(debug=(1,1) )
+	s.gibbs_sample_once(debug=(1,2) )
+	s.gibbs_sample_once(debug=(1,3) )
+	s.gibbs_sample_once(debug=(1,5) )
+	s.gibbs_sample_once(debug=(1,6) )
+	s.gibbs_sample_once(debug=(3,11) )
+	s.gibbs_sample_once(debug=(3,13) )
 	s.gibbs_sample_once()
 
 def boundary_reset_test():
 	s = segmented_corpus('br-phono-toy.txt')
-	s.gibbs_sample_once((1,1) )
+	s.gibbs_sample_once(debug=(1,1) )
 	s.remove_all_boundaries()
-	s.gibbs_sample_once((1,1) )
+	s.gibbs_sample_once(debug=(1,1) )
+
+def boundary_random_test():
+	s = segmented_corpus('br-phono-toy.txt')
+	s.gibbs_sample_once(debug=(1,1) )
+	s.initialize_boundaries_randomly()
+	s.gibbs_sample_once(debug=(1,1) )	
 
 def gibbs_test():
 	s = segmented_corpus('br-phono-toy.txt')
@@ -320,19 +381,19 @@ def gibbs_test():
 	s.gibbs_sampler()
 
 	#just to show the results
-	s.gibbs_sample_once((0,1) )
-	s.gibbs_sample_once((1,1) )
-	s.gibbs_sample_once((2,1) )
-	s.gibbs_sample_once((3,1) )
+	s.gibbs_sample_once(debug=(0,1) )
+	s.gibbs_sample_once(debug=(1,1) )
+	s.gibbs_sample_once(debug=(2,1) )
+	s.gibbs_sample_once(debug=(3,1) )
 
-	s.eval()
+	s.print_evaluation()
 
 def joint_prop_test():
 	s = segmented_corpus('br-phono-toy.txt')
 	print s.P_corpus()
 	s.remove_all_boundaries()
 	print s.P_corpus()
-	s.gibbs_sampler(50)
+	s.gibbs_sampler()
 	print s.P_corpus()
 
 def gibbs_log_demo():
@@ -342,28 +403,43 @@ def gibbs_log_demo():
 	import matplotlib.pyplot as plt
 	s = segmented_corpus('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	logPs = s.gibbs_sampler(True)
-	plt.ylabel('Joint log probability')
+	logs = s.gibbs_sampler(log=['P_corpus', 'n_types', 'n_tokens'])
+
+	fig, ax1 = plt.subplots()
 	plt.xlabel('Iteration')
-	plt.plot(logPs)
+
+	l1 = ax1.plot(logs['P_corpus'],'-r', label='joint probability')
+	ax1.set_ylabel('Joint log probability')
+	
+	ax2 = ax1.twinx()
+	l2 = ax2.plot(logs['n_types'], label='Types')
+	l3 = ax2.plot(logs['n_tokens'],label='Tokens')
+	ax2.set_ylabel('Count')
+
+	#create combined legend
+	lns = l1+l2+l3
+	plt.legend(lns, [l.get_label() for l in lns], loc=0)
+
+	plt.legend()
 	plt.show()
 
 def eval_demo():
 	s = segmented_corpus('br-phono-toy.txt')
-	s.eval()
+	s.print_evaluation()
 	s.remove_all_boundaries()
-	s.eval()
-	s.gibbs_sampler(100)
-	s.eval()
+	s.print_evaluation()
+	s.gibbs_sampler()
+	s.print_evaluation()
 
 
 def main():
-	gibbs_demo()
-	boundary_reset_test()
-	gibbs_test()
-	joint_prop_test()
-	gibbs_log_demo()
-	eval_demo()
+	#gibbs_demo()
+	#boundary_reset_test()
+	boundary_random_test()
+	#gibbs_test()
+	#joint_prop_test()
+	#gibbs_log_demo()
+	#eval_demo()
 
 if __name__ == '__main__':
 	main()
