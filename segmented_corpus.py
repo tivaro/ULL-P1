@@ -150,92 +150,96 @@ class segmented_corpus:
 		alpha0 = self.alpha0
 		rho    = self.rho
 
-		#Randomly draw boundary location
-		u, boundary = debug or self.sample_list[np.random.randint(len(self.sample_list))]
-		utterance   = self.utterances[u]
-		boundaries  = self.boundaries[u]
+		#allow the funcion to sample just one boundary for demonstration purposes
+		boundaries = self.sample_list
+		if debug: boundaries = [debug]
 
-		#Find previous and next boundary
-		prev_b, next_b, boundary_exists, insert_boundary_at = segmented_corpus.neighbours(boundaries, boundary)
-		prev_b = prev_b or 0
-		utterance_final = not next_b
+		#loop over all boundary locations
+		for u, boundary in boundaries:
+			utterance   = self.utterances[u]
+			boundaries  = self.boundaries[u]
 
-		#find start, end
-		w1 = utterance[prev_b:next_b]
-		w2 = w1[:boundary-prev_b]
-		w3 = w1[boundary-prev_b:]
+			#Find previous and next boundary
+			prev_b, next_b, boundary_exists, insert_boundary_at = segmented_corpus.neighbours(boundaries, boundary)
+			prev_b = prev_b or 0
+			utterance_final = not next_b
 
-		if debug:
-			print "     " + " " * (boundary - 1 + insert_boundary_at - boundary_exists) + 'V' + ' ' * int(boundary_exists) + 'V'
-			print "utt: " + segmented_corpus.insert_boundaries(utterance, boundaries)
-			print "w1: " + w1
-			print "w2: " + w2
-			print "w3: " + w3
+			#find start, end
+			w1 = utterance[prev_b:next_b]
+			w2 = w1[:boundary-prev_b]
+			w3 = w1[boundary-prev_b:]
 
-		# calculate the word counts over all the OTHER words,
-		# this means that we should substract the counts for the part under consideration (w1)
-		# if the boundary exists, thrn we need to substract 2 words (w2 and w3 are in there right now)
-		# if the boundary does not exist, then we neet to substract 1 word (w1 is in there now)
-		n_total   = max(self.total_word_count - 1 - int(boundary_exists), 0)
+			if debug:
+				print "     " + " " * (boundary - 1 + insert_boundary_at - boundary_exists) + 'V' + ' ' * int(boundary_exists) + 'V'
+				print "utt: " + segmented_corpus.insert_boundaries(utterance, boundaries)
+				print "w1: " + w1
+				print "w2: " + w2
+				print "w3: " + w3
 
-		nw1 = max(self.word_counts[w1] - int(not boundary_exists), 0)
-		nw2 = max(self.word_counts[w2] - int(boundary_exists), 0)
-		nw3 = max(self.word_counts[w3] - int(boundary_exists), 0)
+			# calculate the word counts over all the OTHER words,
+			# this means that we should substract the counts for the part under consideration (w1)
+			# if the boundary exists, thrn we need to substract 2 words (w2 and w3 are in there right now)
+			# if the boundary does not exist, then we neet to substract 1 word (w1 is in there now)
+			n_total   = max(self.total_word_count - 1 - int(boundary_exists), 0)
+
+			nw1 = max(self.word_counts[w1] - int(not boundary_exists), 0)
+			nw2 = max(self.word_counts[w2] - int(boundary_exists), 0)
+			nw3 = max(self.word_counts[w3] - int(boundary_exists), 0)
 
 
-		n_utter_ends = len(self.utterances) - int(utterance_final)
-		nu = n_utter_ends if utterance_final else n_total - n_utter_ends
+			n_utter_ends = len(self.utterances) - int(utterance_final)
+			nu = n_utter_ends if utterance_final else n_total - n_utter_ends
 
-		p_no_boundary = (1.0 * (nw1 + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
-						(1.0 * (nu + (rho/2)) / (n_total + rho))
+			p_no_boundary = (1.0 * (nw1 + alpha0 * self.P0(w1)) / (n_total + alpha0)) * \
+							(1.0 * (nu + (rho/2)) / (n_total + rho))
 
-		p_boundary =	(1.0 * (nw2 + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
-						(1.0 * (n_total - n_utter_ends+ (rho/2)) / (n_total + rho) ) * \
-						(1.0 * (nw3 + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
-						(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
+			p_boundary =	(1.0 * (nw2 + alpha0 * self.P0(w2)) / (n_total + alpha0)) * \
+							(1.0 * (n_total - n_utter_ends+ (rho/2)) / (n_total + rho) ) * \
+							(1.0 * (nw3 + int(w2 == w3) + alpha0 * self.P0(w3))/ (n_total + 1 + alpha0)) * \
+							(1.0 * (nu  + int(w2 == w3) + (rho/2)) / (n_total + 1 + rho))
 
-		# Modify probabilities using annealing
-		p_boundary    = p_boundary**(1.0 / self.temperature)
-		p_no_boundary = p_no_boundary**(1.0 / self.temperature)
+			# Modify probabilities using annealing
+			p_boundary    = p_boundary**(1.0 / self.temperature)
+			p_no_boundary = p_no_boundary**(1.0 / self.temperature)
 
-		#sample proportionally
-		mu = p_boundary / (p_boundary + p_no_boundary)
-		insert_boundary = mu > random()
+			#sample proportionally
+			mu = p_boundary / (p_boundary + p_no_boundary)
+			insert_boundary = mu > random()
 
-		if debug:
-			print 'p( B):', p_boundary, '*' * int(insert_boundary)
-			print 'p(-B):', p_no_boundary, '*' * int(not insert_boundary)
-			print ' (mu=', mu, ')'
+			if debug:
+				print 'p( B):', p_boundary, '*' * int(insert_boundary)
+				print 'p(-B):', p_no_boundary, '*' * int(not insert_boundary)
+				print ' (mu=', mu, ')'
 
-		if insert_boundary != boundary_exists:
-			# we have to update the boundary and the counts
+			if insert_boundary != boundary_exists:
+				# we have to update the boundary and the counts
 
-			if insert_boundary:
+				if insert_boundary:
 
-				if debug: print "Insertamos"
-				if debug: print self.boundaries[u], self.total_word_count
+					if debug: print "Insertamos"
+					if debug: print self.boundaries[u], self.total_word_count
 
-				# Insert boundary
-				self.boundaries[u].insert(insert_boundary_at,boundary)
+					# Insert boundary
+					self.boundaries[u].insert(insert_boundary_at,boundary)
 
-				# Update counts
-				self.substract_word_count(w1)
-				self.add_word_count([w2, w3])
+					# Update counts
+					self.substract_word_count(w1)
+					self.add_word_count([w2, w3])
 
-				if debug: print self.boundaries[u], self.total_word_count
+					if debug: print self.boundaries[u], self.total_word_count
 
-			else:
-				if debug: print "Eliminamos"
-				if debug: print self.boundaries[u], self.total_word_count
+				else:
+					if debug: print "Eliminamos"
+					if debug: print self.boundaries[u], self.total_word_count
 
-				# Remove boundary
-				self.boundaries[u].pop(insert_boundary_at)
+					# Remove boundary
+					self.boundaries[u].pop(insert_boundary_at)
 
-				# Update counts
-				self.substract_word_count([w2, w3])
-				self.add_word_count(w1)
+					# Update counts
+					self.substract_word_count([w2, w3])
+					self.add_word_count(w1)
 
-				if debug: print self.boundaries[u], self.total_word_count
+					if debug: print self.boundaries[u], self.total_word_count
 
 
 	def eval(self):
@@ -328,7 +332,7 @@ def joint_prop_test():
 	print s.P_corpus()
 	s.remove_all_boundaries()
 	print s.P_corpus()
-	s.gibbs_sampler(5000)
+	s.gibbs_sampler(50)
 	print s.P_corpus()
 
 def gibbs_log_demo():
@@ -349,16 +353,16 @@ def eval_demo():
 	s.eval()
 	s.remove_all_boundaries()
 	s.eval()
-	s.gibbs_sampler(10000)
+	s.gibbs_sampler(100)
 	s.eval()
 
 
 def main():
-	#gibbs_demo()
-	#boundary_reset_test()
-	#gibbs_test()
-	#joint_prop_test()
-	#gibbs_log_demo()
+	gibbs_demo()
+	boundary_reset_test()
+	gibbs_test()
+	joint_prop_test()
+	gibbs_log_demo()
 	eval_demo()
 
 if __name__ == '__main__':
