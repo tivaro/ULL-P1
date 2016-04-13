@@ -43,12 +43,13 @@ class segmented_corpus:
 		#temp_regimes decides the amount of iterations and the temperature regime
 		temp_regimes = []
 		temp_regimes.append([20000, np.arange(0.1,1.1,0.1)])
+		temp_regimes.append([30000, np.arange(0.1,1.6,0.1)])
 		temp_regimes.append([40000, np.arange(0.002,1.002,0.002)])
 		self.temp_regime = temp_regimes[temp_regime_id]
 		#compute the time steps when we have to change temperatures
 		self.temp_regime.append(int(self.temp_regime[0]/len(self.temp_regime[1])))
 		self.temp_regime = tuple(self.temp_regime)
-		print(self.temp_regime)
+		#print(self.temp_regime)
 		"""
 		for example:
 		iterations = 20000
