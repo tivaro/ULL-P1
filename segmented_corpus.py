@@ -263,17 +263,27 @@ class segmented_corpus:
 					if debug: print self.boundaries[u], self.total_word_count
 
 
-
-
-	def eval(self):
+	def evaluate(self):
+		"""
+		Returns a dict of tuples (precicion, recall, F0) for:
+		'words',
+		'boundaries',
+		'lexicon'
+		"""
 		words = utils.eval_words(self.boundaries, self.original_boundaries)
 		boundaries = utils.eval_boundaries(self.boundaries, self.original_boundaries)
 		lexicon = utils.eval_lexicon(self.word_counts, self.original_word_counts)
 
+		return {'words': words, 'boundaries':boundaries, 'lexicon':lexicon}
+
+
+	def print_evaluation(self):
+		evaluation = self.evaluate()
+
 		print '=== Evaluation ========================'
-		print 'Pw = %.3f, Rw = %.3f, Fw = %.3f' % words
-		print 'Pb = %.3f, Rb = %.3f, Fb = %.3f' % boundaries
-		print 'Pl = %.3f, Rl = %.3f, Fl = %.3f' % lexicon
+		print 'Pw = %.3f, Rw = %.3f, Fw = %.3f' % evaluation['words']
+		print 'Pb = %.3f, Rb = %.3f, Fb = %.3f' % evaluation['boundaries']
+		print 'Pl = %.3f, Rl = %.3f, Fl = %.3f' % evaluation['lexicon']
 
 	@staticmethod
 	def neighbours(sorted_list, entry, full_description = True):
@@ -348,7 +358,7 @@ def gibbs_test():
 	s.gibbs_sample_once((2,1) )
 	s.gibbs_sample_once((3,1) )
 
-	s.eval()
+	s.print_evaluation()
 
 def joint_prop_test():
 	s = segmented_corpus('br-phono-toy.txt')
@@ -387,11 +397,11 @@ def gibbs_log_demo():
 
 def eval_demo():
 	s = segmented_corpus('br-phono-toy.txt')
-	s.eval()
+	s.print_evaluation()
 	s.remove_all_boundaries()
-	s.eval()
-	s.gibbs_sampler(100)
-	s.eval()
+	s.print_evaluation()
+	s.gibbs_sampler()
+	s.print_evaluation()
 
 
 def main():
@@ -399,8 +409,8 @@ def main():
 	#boundary_reset_test()
 	#gibbs_test()
 	#joint_prop_test()
-	gibbs_log_demo()
-	#eval_demo()
+	#gibbs_log_demo()
+	eval_demo()
 
 if __name__ == '__main__':
 	main()
