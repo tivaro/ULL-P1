@@ -10,3 +10,11 @@ srun -u python "experiments.py" && export subject="SUCCES :)" || export subject=
 mailx -s $subject < /dev/null "tivarosite@gmail.com"
 
 sleep 20
+
+git add results/*.json
+
+git commit -m "Automated results push"
+
+git push
+
+sleep 20
