@@ -127,21 +127,41 @@ class segmented_corpus:
 		return sum(np.log(pws))
 
 
-	def gibbs_sampler(self, log_P_corpus=False, debug=None):
+	def gibbs_sampler(self, log=[], debug=None):
+		"""
+		Performs gibs sampling according to the iteration/temperature scheme in s.temp_regime
+		the variable log should be a list with values that should be logged after each iteration (the log is returned)
+		possible elements are:
+			'P_corpus': the probabilty of the entire corpus
+			'n_types': the lexicon size
+			'n_tokens': the number of tokens
+			'temperature': the temperature used at each iteration
+		"""
 
 		iterations, temp_steps, step_size = self.temp_regime
 		p = ProgressBar(iterations)
 
-		P_corpus_log = []
+		# initialize log
+		logs = {var:[] for var in log}
 
 		for i in range(iterations):
+
+			#update temperature
 			if i%step_size == 0:
 				self.temperature = 1/temp_steps[i/step_size]
-			self.gibbs_sample_once(debug)
-			if log_P_corpus: P_corpus_log.append(self.P_corpus())
-			p.animate()
 
-		if log_P_corpus: return P_corpus_log
+			#do one iteration and update progressbar
+			self.gibbs_sample_once(debug)
+			p.animate(i)
+
+			#update log
+			if 'P_corpus'    in log: logs['P_corpus'].append( self.P_corpus())
+			if 'n_types'     in log: logs['n_types'].append( len(self.word_counts))
+			if 'n_tokens'    in log: logs['n_tokens'].append( self.total_word_count)
+			if 'temperature' in log: logs['temperature'].append( self.temperature)
+
+
+		if log: return logs
 
 
 	def gibbs_sample_once(self, debug=None):
@@ -342,10 +362,24 @@ def gibbs_log_demo():
 	import matplotlib.pyplot as plt
 	s = segmented_corpus('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	logPs = s.gibbs_sampler(True)
-	plt.ylabel('Joint log probability')
+	logs = s.gibbs_sampler(log=['P_corpus', 'n_types', 'n_tokens'])
+
+	fig, ax1 = plt.subplots()
 	plt.xlabel('Iteration')
-	plt.plot(logPs)
+
+	l1 = ax1.plot(logs['P_corpus'],'-r', label='joint probability')
+	ax1.set_ylabel('Joint log probability')
+	
+	ax2 = ax1.twinx()
+	l2 = ax2.plot(logs['n_types'], label='Types')
+	l3 = ax2.plot(logs['n_tokens'],label='Tokens')
+	ax2.set_ylabel('Count')
+
+	#create combined legend
+	lns = l1+l2+l3
+	plt.legend(lns, [l.get_label() for l in lns], loc=0)
+
+	plt.legend()
 	plt.show()
 
 def eval_demo():
@@ -358,12 +392,12 @@ def eval_demo():
 
 
 def main():
-	gibbs_demo()
-	boundary_reset_test()
-	gibbs_test()
-	joint_prop_test()
+	#gibbs_demo()
+	#boundary_reset_test()
+	#gibbs_test()
+	#joint_prop_test()
 	gibbs_log_demo()
-	eval_demo()
+	#eval_demo()
 
 if __name__ == '__main__':
 	main()
