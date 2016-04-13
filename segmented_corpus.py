@@ -16,10 +16,13 @@ class segmented_corpus:
 	rho = 2 #parameter of beta prior over utterance end
 	p_dash = 0.5 #probability of ending a word (in P_0)
 
-
 	word_counts		 = Counter() #other word counts
 	total_word_count = 0
 	original_word_counts = Counter()
+
+	phoneme_counts = Counter()
+	total_phoneme_count = 0
+	P0_cache = {}
 
 	utterances = [] #list of utterances (unseparated)
 	boundaries = [] #list of list. indexed by utterance_id each entry containing a list with the positions of the boundaries (range 1-len(utterance)-1)
@@ -66,10 +69,19 @@ class segmented_corpus:
 		self.word_counts      = Counter()
 		self.total_word_count = 0
 
+		self.phoneme_counts   = Counter()
+
 		for utterance, ut_boundaries in zip(utterances, boundaries):
 			words = segmented_corpus.split_utterance(utterance, ut_boundaries)
 			self.word_counts += Counter(words)
 			self.total_word_count += len(words)
+
+			for phonemes in map(list, words):
+				self.phoneme_counts += Counter(phonemes)
+
+		self.total_phoneme_count = sum(self.phoneme_counts.values())
+		self.unique_phoneme_count = len(self.phoneme_counts.keys())
+		self.P0_cache = {}
 
 
 	def substract_word_count(self, word_or_words, times = 1):
@@ -106,14 +118,17 @@ class segmented_corpus:
 		boundaries = [[] for _ in range(len(utterances))]
 		self.initialize_lexicon(utterances, boundaries)
 
-
+	def P_phoneme(self, x):
+		return self.phoneme_counts[x] / float(self.total_phoneme_count)
 
 	def P0(self, word):
-		M = len(word)
-		#right now let's use a uniform phoneme distribution
-		#TODO: look this up and find a sensible value!
-		Pphoneme = 1.0 / 30
-		return self.p_dash * ((self.p_dash)**(M-1) ) * (Pphoneme ** M)
+		if word not in self.P0_cache:
+			M = len(word)
+			Pphoneme = np.prod([self.P_phoneme(x) for x in list(word)])
+
+			self.P0_cache[word] = self.p_dash * ((self.p_dash)**(M-1)) * Pphoneme
+
+		return self.P0_cache[word]
 
 	def P_corpus(self):
 		"""
