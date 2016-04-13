@@ -1,6 +1,7 @@
 #Delete the email file
 export file="emailed_user"
-if ! [ -f "$file" ]
+if [ -f "$file" ]
+     then
 	rm "$file"
 fi
 
