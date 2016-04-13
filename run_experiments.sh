@@ -7,11 +7,9 @@ cd ~/ULL-P1
 
 srun -u python "experiments.py" && export subject="SUCCES :)" || export subject="FAILURE :("
 
-mailx -s "$subject" < /dev/null "tivarosite@gmail.com"
-
 #Only mail the user once
 export file="emailed_user"
-if ! [ -f "$file" ]
+if ! [ -f "./$file" ]
 	then
 	mailx -s $subject < /dev/null "tivarosite@gmail.com"
 	touch "$file"
