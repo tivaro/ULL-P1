@@ -1,13 +1,12 @@
 #!/bin/bash
-#SBATCH -p cpu
 #SBATCH -N 1
 #SBATCH -t 22:00:00
 module load python
 
-if [ srun -u python "SVM.py" ]; then
-	mailx -s "Experiment completed\! :)" < /dev/null "tivarosite@gmail.com"
-else
-	mailx -s "Experiment failed :(" < /dev/null "tivarosite@gmail.com"
-fi
+cd ~/ULL-P1
+
+srun -u python "experiments.py" && export subject="SUCCES :)" || export subject="FAILURE :("
+
+mailx -s $subject < /dev/null "tivarosite@gmail.com"
 
 sleep 20
