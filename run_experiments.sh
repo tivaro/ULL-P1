@@ -1,5 +1,4 @@
 #!/bin/bash
-#SBATCH -p cpu
 #SBATCH -N 1
 #SBATCH -t 22:00:00
 module load python
