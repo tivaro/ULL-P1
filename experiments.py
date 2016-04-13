@@ -3,7 +3,7 @@ import json
 import os.path
 
 
-__DEFAULT_DATAFILE__ = 'br-phono-toy.txt'
+__DEFAULT_DATAFILE__ = 'br-phono-train.txt'
 __STORE_FOLDER__ = 'results/'
 
 
