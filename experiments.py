@@ -45,7 +45,7 @@ def run_experiment(s, name, description, datafile):
 ########################    Experiment 1: different P0 methods     #########################
 ############################################################################################
 
-basename = 'exp01-P0-method'
+basename = 'exp01-P0_method'
 description = 'MLE vs uniform P0'
 datafile = __DEFAULT_DATAFILE__
 
@@ -74,7 +74,7 @@ run_experiment(s, name, description, datafile)
 ############################################################################################
 
 alphas = [1, 2, 5, 10, 20, 50, 100, 200, 500]
-basename = 'exp02-alpha'
+basename = 'exp02-alpha-'
 description = 'Using default parameters, varying alpha'
 datafile = __DEFAULT_DATAFILE__
 
@@ -97,7 +97,7 @@ for alpha in alphas:
 ############################################################################################
 
 p_dashes = [0.1, 0.3, 0.5, 0.7, 0.9]
-basename = 'exp03-p_dash'
+basename = 'exp03-p_dash-'
 description = 'Using default parameters, varying p_dash'
 datafile = __DEFAULT_DATAFILE__
 
@@ -125,7 +125,7 @@ datafile = __DEFAULT_DATAFILE__
 
 
 #####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'true-init'
+name = basename + 'true_init'
 #Initilize the courpus
 s = sc.segmented_corpus(datafile)
 
@@ -133,7 +133,7 @@ s = sc.segmented_corpus(datafile)
 run_experiment(s, name, description, datafile)
 
 #####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'no-init'
+name = basename + 'no_init'
 
 #Initilize the courpus
 s = sc.segmented_corpus(datafile)
@@ -144,7 +144,7 @@ s.remove_all_boundaries()
 run_experiment(s, name, description, datafile)
 
 #####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'random-0.33-init'
+name = basename + 'random_0.33_init'
 
 #Initilize the courpus
 s = sc.segmented_corpus(datafile)
@@ -155,7 +155,7 @@ s.initialize_boundaries_randomly(1.0 / 3)
 run_experiment(s, name, description, datafile)
 
 #####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'random-0.66-init'
+name = basename + 'random_0.66_init'
 
 #Initilize the courpus
 s = sc.segmented_corpus(datafile)
@@ -166,7 +166,7 @@ s.initialize_boundaries_randomly(2.0 / 3)
 run_experiment(s, name, description, datafile)
 
 #####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'all-init'
+name = basename + 'all_init'
 
 #Initilize the courpus
 s = sc.segmented_corpus(datafile)
@@ -181,7 +181,7 @@ run_experiment(s, name, description, datafile)
 ###################    Experiment 5: different temperature schemes    ######################
 ############################################################################################
 
-basename = 'exp05-temp-regime'
+basename = 'exp05-temp_regime'
 description = 'Using default parameters, varying temperature regime'
 datafile = __DEFAULT_DATAFILE__
 temp_regimes = range(3)
@@ -189,7 +189,7 @@ temp_regimes = range(3)
 for temp_regime in temp_regimes:
 	name = basename + `temp_regime`
 
-	#Initilize the courpus with the right paramters
+	#Initilize the corpus with the right paramters
 	s = sc.segmented_corpus(datafile,temp_regime_id=temp_regime)
 
 	#initilize the boundaries
