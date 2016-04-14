@@ -327,7 +327,7 @@ class segmented_corpus:
 		"""
 		words = utils.eval_words(self.boundaries, self.original_boundaries)
 		boundaries = utils.eval_boundaries(self.boundaries, self.original_boundaries)
-		lexicon = utils.eval_lexicon(self.word_counts, self.original_word_counts)
+		lexicon = utils.eval_lexicon(self.seating, self.original_seating)
 
 		return {'words': words, 'boundaries':boundaries, 'lexicon':lexicon}
 
@@ -488,13 +488,13 @@ def eval_demo():
 
 
 def main():
-	gibbs_demo()
+	#gibbs_demo()
 	#boundary_reset_test()
 	#boundary_random_test()
 	#gibbs_test()
 	#joint_prop_test()
 	#gibbs_log_demo()
-	#eval_demo()
+	eval_demo()
 
 if __name__ == '__main__':
 	main()
