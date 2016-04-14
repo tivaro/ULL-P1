@@ -228,4 +228,4 @@ def split_utterance(utterance, boundaries):
 	return [utterance[(i):(j)] for i, j in zip([0]+boundaries, boundaries+[None])]
 
 def insert_boundaries(utterance, boundaries, delimiter = '.'):
-	return delimiter.join(word_segmentation.split_utterance(utterance, boundaries))
+	return delimiter.join(split_utterance(utterance, boundaries))
