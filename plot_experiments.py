@@ -61,26 +61,37 @@ for exp_type in experiments:
             print file_name
             exp_output = json.load(f)
             evaluation = exp_output['evaluation']
+            #print evaluation
             for k in evaluation:
                 append_to_dict(precision, k, evaluation[k][0])
                 append_to_dict(recall, k, evaluation[k][1])
                 append_to_dict(f0, k, evaluation[k][2])
         #plot the stuff and save it
+        """
+        print precision
+        print recall
+        print f0
+        """
         print 'making plots for ' + exp_type
+        sorted_x = sorted(x_axis)
         for k in precision:
-            plt.plot(x_axis, precision[k])
+            sorted_precision = [p for (x,p) in sorted(zip(x_axis,precision[k]))]
+            plt.plot(sorted_x, sorted_precision, marker='.')
             plt.xlabel(experiment_name)
             plt.ylabel('precision')
-            plt.save_fig(plot_dir + experiment_name + k + 'precision.png')
+            plt.savefig(plot_dir + experiment_name +'-'+ k +'-'+ 'precision.png')
+            plt.clf() #clear the plot figure
 
-            plt.plot(x_axis, recall[k])
-            plt.xlabel(experiment_name)
+            sorted_recall = [r for (x,r) in sorted(zip(x_axis,recall[k]))]
+            plt.plot(sorted_x, sorted_recall, marker='.')
             plt.ylabel('recall')
-            plt.save_fig(plot_dir + experiment_name + k + 'recall.png')
+            plt.savefig(plot_dir + experiment_name +'-'+ k +'-'+ 'recall.png')
+            plt.clf() #clear the plot figure
 
-            plt.plot(x_axis, f0[k])
-            plt.xlabel(experiment_name)
+            sorted_f0 = [f for (x,f) in sorted(zip(x_axis,f0[k]))]
+            plt.plot(sorted_x, sorted_f0, marker='.')
             plt.ylabel('f0')
-            plt.save_fig(plot_dir + experiment_name + k + 'f0.png')
+            plt.savefig(plot_dir + experiment_name +'-'+ k +'-'+ 'f0.png')
+            plt.clf() #clear the plot figure
     else: #we have to plot performance over time (???)
         pass
