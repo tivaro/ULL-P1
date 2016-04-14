@@ -165,7 +165,6 @@ class Word_segmentation_model(object):
 	def getWordCounts(self):
 		return self.word_counts
 
-
 	def evaluate(self):
 		"""
 		Returns a dict of tuples (precicion, recall, F0) for:

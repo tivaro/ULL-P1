@@ -21,7 +21,6 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 	seating		 	 = defaultdict(lambda: np.array([])) #indexed by word, then a list of table counts (e.g. seating['no'] = [25,4,1] means three tables and 30 occurances)
 	K 			 	 = 0 #Total number of tables
 
-
 	def getWordCounts(self):
 		return self.seating
 
@@ -200,6 +199,73 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 					self.boundaries[u].pop(insert_boundary_at)
 
 
+<<<<<<< HEAD:PYP_segmentation_model.py
+=======
+	def evaluate(self):
+		"""
+		Returns a dict of tuples (precicion, recall, F0) for:
+		'words',
+		'boundaries',
+		'lexicon'
+		"""
+		words = utils.eval_words(self.boundaries, self.original_boundaries)
+		boundaries = utils.eval_boundaries(self.boundaries, self.original_boundaries)
+		lexicon = utils.eval_lexicon(self.seating, self.original_seating)
+
+		return {'words': words, 'boundaries':boundaries, 'lexicon':lexicon}
+
+
+	def print_evaluation(self):
+		evaluation = self.evaluate()
+
+		print '=== Evaluation ========================'
+		print 'Pw = %.3f, Rw = %.3f, Fw = %.3f' % evaluation['words']
+		print 'Pb = %.3f, Rb = %.3f, Fb = %.3f' % evaluation['boundaries']
+		print 'Pl = %.3f, Rl = %.3f, Fl = %.3f' % evaluation['lexicon']
+
+	@staticmethod
+	def neighbours(sorted_list, entry, full_description = True):
+		"""
+		Input: sorted list, entry (a possible feature enty)
+		Output: (prev_neighbour, next_neighbour, entry_exists, insert_entry)
+		where insert_entry indicates the place to insert the entry to keep the list sorted
+		"""
+
+		prev_neighbour = None
+		next_neighbour = None
+		entry_exists   = False
+		insert_entry   = len(sorted_list)
+
+
+		for n,e in enumerate(sorted_list):
+
+			if e < entry:
+				prev_neighbour = e
+			elif e == entry:
+				entry_exists = True
+			else:
+				next_neighbour = e
+				insert_entry = n
+				break
+
+		#insert_entry should equal the next element if entry does not exit, but it's true location if entry exists
+		insert_entry -= int(entry_exists)
+
+		if full_description:
+			return prev_neighbour, next_neighbour, entry_exists, insert_entry
+		else:
+			return prev_neighbour, next_neighbour
+
+	@staticmethod
+	def split_utterance(utterance, boundaries):
+		return [utterance[(i):(j)] for i, j in zip([0]+boundaries, boundaries+[None])]
+
+	@staticmethod
+	def insert_boundaries(utterance, boundaries, delimiter = '.'):
+		return delimiter.join(word_segmentation.split_utterance(utterance, boundaries))
+
+
+>>>>>>> 8e6d1d4a6315f9ec456d459e857c1aa980fbe994:PYP_segmentation_model.py
 
 ### DEMO CODE ###
 def gibbs_demo():
