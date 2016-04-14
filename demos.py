@@ -47,7 +47,7 @@ def gibbs_test():
 	print_title("GIBBS TEST")
 	s = DP.DP_word_segmentation_model('br-phono-toy.txt')
 	s.remove_all_boundaries()
-	s.gibbs_sampler()
+	s.gibbs_sampler(iterations=100)
 
 	#just to show the results
 	s.gibbs_sample_once(debug=(0,1) )
@@ -66,7 +66,7 @@ def joint_prob_test():
 		print s.P_corpus()
 		s.remove_all_boundaries()
 		print s.P_corpus()
-		s.gibbs_sampler()
+		s.gibbs_sampler(iterations=100)
 		print s.P_corpus()
 
 def gibbs_log_demo():
@@ -104,8 +104,9 @@ def eval_demo():
 		s.print_evaluation()
 		s.remove_all_boundaries()
 		s.print_evaluation()
-		s.gibbs_sampler()
+		s.gibbs_sampler(iterations=100)
 		s.print_evaluation()
+
 
 def main():
 	gibbs_demo()

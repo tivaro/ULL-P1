@@ -122,7 +122,7 @@ class Word_segmentation_model(object):
 		"""
 		raise(NotImplementedError)
 
-	def gibbs_sampler(self, log=[], debug=None):
+	def gibbs_sampler(self, log=[], iterations=None, debug=None):
 		"""
 		Performs gibs sampling according to the iteration/temperature scheme in s.temp_regime
 		the variable log should be a list with values that should be logged after each iteration (the log is returned)
@@ -131,18 +131,23 @@ class Word_segmentation_model(object):
 			'n_types': the lexicon size
 			'n_tokens': the number of tokens
 			'temperature': the temperature used at each iteration
+		If iterations is specified, the temp_regime will be ignored
 		"""
 
-		iterations, temp_steps, step_size = self.temp_regime
-		p = ProgressBar(iterations)
+		if iterations:
+			iters = iterations
+		else:
+			iters, temp_steps, step_size = self.temp_regime
+
+		p = ProgressBar(iters)
 
 		# initialize log
 		logs = {var:[] for var in log}
 
-		for i in range(iterations):
+		for i in range(iters):
 
 			#update temperature
-			if i % step_size == 0:
+			if not iterations and i % step_size == 0:
 				temperature = 1/temp_steps[i/step_size]
 
 			#do one iteration and update progressbar
