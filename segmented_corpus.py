@@ -168,10 +168,13 @@ class segmented_corpus:
 		(in log probability)
 		"""
 
-		pws = [ (1.0 * (count - 1 + self.alpha0 * self.P0(word)) / (self.total_word_count - 1 + self.alpha0))
-						for word, count in self.word_counts.iteritems()]
+		pws = []
 
-		return sum(np.log(pws))
+		for word, count in self.word_counts.iteritems():
+			pws.append(count * (np.log(1.0 * (count - 1 + self.alpha0 * self.P0(word)))
+								- np.log(self.total_word_count - 1 + self.alpha0)
+								) ) 
+		return sum(pws)
 
 
 	def gibbs_sampler(self, log=[], debug=None):
@@ -459,9 +462,9 @@ def eval_demo():
 def main():
 	#gibbs_demo()
 	#boundary_reset_test()
-	boundary_random_test()
+	#boundary_random_test()
 	#gibbs_test()
-	#joint_prop_test()
+	joint_prop_test()
 	#gibbs_log_demo()
 	#eval_demo()
 
