@@ -15,7 +15,8 @@ if ! [ -f "./$file" ]
 	touch "$file"
 fi
 
-sleep 20
+#wait quit a while, allowing for the other scripts to add their files
+sleep 900
 
 git add results/*.json
 

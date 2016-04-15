@@ -1,4 +1,5 @@
-import segmented_corpus as sc
+from DP_segmentation_model  import DP_word_segmentation_model
+from PYP_segmentation_model import PYP_word_segmentation_model
 import json
 import os.path
 
@@ -52,7 +53,7 @@ datafile = __DEFAULT_DATAFILE__
 name = basename + '-mle'
 
 #Initilize the courpus with the right paramters
-s = sc.segmented_corpus(datafile,P0_method='mle')
+s = DP_word_segmentation_model(datafile,P0_method='mle')
 
 #initilize the boundaries
 s.initialize_boundaries_randomly()
@@ -62,7 +63,7 @@ run_experiment(s, name, description, datafile)
 name = basename + '-uniform'
 
 #Initilize the courpus with the right paramters
-s = sc.segmented_corpus(datafile,P0_method='uniform')
+s = DP_word_segmentation_model(datafile,P0_method='uniform')
 
 #initilize the boundaries
 s.initialize_boundaries_randomly()
@@ -82,7 +83,7 @@ for alpha in alphas:
 	name = basename + `alpha`
 
 	#Initilize the courpus
-	s = sc.segmented_corpus(datafile)
+	s = DP_word_segmentation_model(datafile)
 
 	# set the right paramter
 	s.alpha0 = alpha
@@ -105,7 +106,7 @@ for p_dash in p_dashes:
 	name = basename + `p_dash`
 
 	#Initilize the courpus
-	s = sc.segmented_corpus(datafile)
+	s = DP_word_segmentation_model(datafile)
 
 	# set the right paramter
 	s.p_dash = p_dash
@@ -127,7 +128,7 @@ datafile = __DEFAULT_DATAFILE__
 #####################    Experiment 4: different values of p_dash    ########################
 name = basename + 'true_init'
 #Initilize the courpus
-s = sc.segmented_corpus(datafile)
+s = DP_word_segmentation_model(datafile)
 
 #dont initialise the boundaries
 run_experiment(s, name, description, datafile)
@@ -136,7 +137,7 @@ run_experiment(s, name, description, datafile)
 name = basename + 'no_init'
 
 #Initilize the courpus
-s = sc.segmented_corpus(datafile)
+s = DP_word_segmentation_model(datafile)
 
 #remove all boundaries
 s.remove_all_boundaries()
@@ -147,7 +148,7 @@ run_experiment(s, name, description, datafile)
 name = basename + 'random_0.33_init'
 
 #Initilize the courpus
-s = sc.segmented_corpus(datafile)
+s = DP_word_segmentation_model(datafile)
 
 #initialize randomly
 s.initialize_boundaries_randomly(1.0 / 3)
@@ -158,7 +159,7 @@ run_experiment(s, name, description, datafile)
 name = basename + 'random_0.66_init'
 
 #Initilize the courpus
-s = sc.segmented_corpus(datafile)
+s = DP_word_segmentation_model(datafile)
 
 #initialize randomly
 s.initialize_boundaries_randomly(2.0 / 3)
@@ -169,7 +170,7 @@ run_experiment(s, name, description, datafile)
 name = basename + 'all_init'
 
 #Initilize the courpus
-s = sc.segmented_corpus(datafile)
+s = DP_word_segmentation_model(datafile)
 
 #initialize with all possible boundaries
 s.initialize_boundaries_randomly(1.0)
@@ -190,7 +191,32 @@ for temp_regime in temp_regimes:
 	name = basename + `temp_regime`
 
 	#Initilize the corpus with the right paramters
-	s = sc.segmented_corpus(datafile,temp_regime_id=temp_regime)
+	s = DP_word_segmentation_model(datafile,temp_regime_id=temp_regime)
+
+	#initilize the boundaries
+	s.initialize_boundaries_randomly()
+
+	run_experiment(s, name, description, datafile)
+
+
+############################################################################################
+###################    Experiment 5: PYP varying alpha and beta      ######################
+############################################################################################
+
+basename = 'exp06-PYP'
+description = 'PYP algorithm with different alpha an beta combination'
+datafile = __DEFAULT_DATAFILE__
+
+alphas = [1, 5, 10, 50, 100, 500]
+betas = [0.2, 0.4,0.6, 0.8, 1, 0]
+
+for temp_regime in temp_regimes:
+	name = basename + '-alpha-' + `alpha` + '-beta-' + beta
+
+	#Initilize the corpus with the right paramters
+	s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
+	s.alpha = alpha
+	s.beta  = beta
 
 	#initilize the boundaries
 	s.initialize_boundaries_randomly()
