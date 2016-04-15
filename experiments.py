@@ -43,6 +43,31 @@ def run_experiment(s, name, description, datafile):
 			json.dump(output, outfile)
 
 ############################################################################################
+###################    Experiment 6: PYP varying alpha and beta      ######################
+############################################################################################
+
+basename = 'exp06-PYP'
+description = 'PYP algorithm with different alpha an beta combination'
+datafile = __DEFAULT_DATAFILE__
+
+alphas = [1, 5, 10, 50, 100, 500]
+betas = [0.2, 0.4,0.6, 0.8, 1, 0]
+
+for temp_regime in temp_regimes:
+	name = basename + '-alpha-' + `alpha` + '-beta-' + beta
+
+	#Initilize the corpus with the right paramters
+	s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
+	s.alpha = alpha
+	s.beta  = beta
+
+	#initilize the boundaries
+	s.initialize_boundaries_randomly()
+
+	run_experiment(s, name, description, datafile)
+				
+
+############################################################################################
 ########################    Experiment 1: different P0 methods     #########################
 ############################################################################################
 
@@ -192,31 +217,6 @@ for temp_regime in temp_regimes:
 
 	#Initilize the corpus with the right paramters
 	s = DP_word_segmentation_model(datafile,temp_regime_id=temp_regime)
-
-	#initilize the boundaries
-	s.initialize_boundaries_randomly()
-
-	run_experiment(s, name, description, datafile)
-
-
-############################################################################################
-###################    Experiment 5: PYP varying alpha and beta      ######################
-############################################################################################
-
-basename = 'exp06-PYP'
-description = 'PYP algorithm with different alpha an beta combination'
-datafile = __DEFAULT_DATAFILE__
-
-alphas = [1, 5, 10, 50, 100, 500]
-betas = [0.2, 0.4,0.6, 0.8, 1, 0]
-
-for temp_regime in temp_regimes:
-	name = basename + '-alpha-' + `alpha` + '-beta-' + beta
-
-	#Initilize the corpus with the right paramters
-	s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
-	s.alpha = alpha
-	s.beta  = beta
 
 	#initilize the boundaries
 	s.initialize_boundaries_randomly()
