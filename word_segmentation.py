@@ -139,10 +139,9 @@ class Word_segmentation_model(object):
 		else:
 			iters, temp_steps, step_size = self.temp_regime
 
-		p = ProgressBar(iters)
-
-		# initialize log
+		# initialize log and progress bar
 		logs = {var:[] for var in log}
+		p = ProgressBar(iters)
 
 		for i in range(iters):
 

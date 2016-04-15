@@ -82,12 +82,22 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 		if isinstance(word_or_words, list):
 			[self.remove_customer(word) for word in word_or_words]
 		else:
+			#sample table to remove word from proportional to customers at table
 			word_seating = self.seating[word_or_words]
 			tables = word_seating / sum(word_seating)
 			table = np.random.choice(len(tables), 1, p=tables)
 
+			#delete the table if there is only one customer
 			if word_seating[table] == 1:
-				self.seating[word_or_words] = np.delete(word_seating, table)
+				self.K -= 1
+
+				#delete the entry if this was the last table
+				if sum(word_seating) == 1:
+					self.seating.pop(word_or_words)
+				else:
+					self.seating[word_or_words] = np.delete(word_seating, table)
+				
+
 			else:
 				word_seating[table] -= 1
 
@@ -103,9 +113,11 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 		pws = []
 
 		for word, tables in self.seating.iteritems():
-			pws.append(sum(tables) * (np.log( (self.P0(word) * self.alpha) + sum(tables) + (self.beta * (self.K - len(tables)) ) )
+			pws.append(sum(tables) * (np.log(sum(tables) - 1 + (self.alpha * self.P0(word)) + (self.beta * (self.K - len(tables)) ) )
 								- np.log(self.total_word_count - 1 + self.alpha)
 								) )
+			if np.isnan(pws[len(pws)-1]):
+				print 'ERERER', word, tables
 		return sum(pws)
 
 
@@ -158,6 +170,9 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 			kw2 = len(self.seating[w2])
 			kw3 = len(self.seating[w3])			
 
+			# We possibly created empty values, remove them from the dict
+			[self.seating.pop(w) for w in [w1, w2, w3] if len(self.seating[w]) == 0]
+
 			n_utter_ends = len(self.utterances) - int(utterance_final)
 			nu = n_utter_ends if utterance_final else n_total - n_utter_ends
 
@@ -178,6 +193,11 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 			insert_boundary = mu > random()
 
 			if debug:
+				print "     " + " " * (boundary - 1 + insert_boundary_at) + 'V' + ' ' * int(boundary_exists) + 'V'
+				print "utt: " + word_segmentation.insert_boundaries(utterance, boundaries)
+				print "w1: " + w1
+				print "w2: " + w2
+				print "w3: " + w3
 				print 'p( B):', p_boundary, '*' * int(insert_boundary)
 				print 'p(-B):', p_no_boundary, '*' * int(not insert_boundary)
 				print ' (mu=', mu, ')'

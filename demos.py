@@ -107,15 +107,48 @@ def eval_demo():
 		s.gibbs_sampler(iterations=100)
 		s.print_evaluation()
 
+def PYP_as_DP_demo():
+	"""
+	Set beta in the PYP to 0 and check if it behaves the same as the DP model
+	"""
+	print_title("PYP AS DP demo")
+	print "Set beta in the PYP to 0 and check if it behaves the same as the DP model"
+
+	DPM  = DP.DP_word_segmentation_model
+	PYPM = PYP.PYP_word_segmentation_model
+
+	DPM.alpha  = 10
+	PYPM.alpha = 10
+	PYPM.beta  = 0
+
+	DPM  = DPM('br-phono-train.txt')
+	PYPM = PYPM('br-phono-train.txt')
+
+	print '#types', len(DPM.word_counts.keys()),  len(PYPM.seating.keys())
+	print '#occurences bUk', DPM.word_counts['bUk'], sum(PYPM.seating['bUk'])
+	print 'P(W)', DPM.P_corpus(), PYPM.P_corpus()
+
+	DP_log  = DPM.gibbs_sampler(iterations=15, log=['P_corpus'])
+	PYP_log = PYPM.gibbs_sampler(iterations=15, log=['P_corpus'])
+
+	import matplotlib.pyplot as plt
+	plt.plot(DP_log['P_corpus'], label='DP')
+	plt.plot(PYP_log['P_corpus'], label='PYP')
+	plt.legend()
+	plt.show()
+
+	print PYP_log['P_corpus']
 
 def main():
-	gibbs_demo()
-	boundary_reset_test()
-	boundary_random_test()
-	eval_demo()
-	gibbs_test()
-	joint_prob_test()
-	gibbs_log_demo()
+	#gibbs_demo()
+	#boundary_reset_test()
+	#boundary_random_test()
+	#eval_demo()
+	#gibbs_test()
+	#joint_prob_test()
+	#gibbs_log_demo()
+
+	PYP_as_DP_demo()
 
 if __name__ == '__main__':
 	main()
