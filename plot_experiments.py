@@ -81,7 +81,7 @@ for exp_type in experiments:
         if experiment_name == 'p_dash':
             mathed_experiment_name = r'$p_\#$'
         elif experiment_name == 'alpha':
-            mathed_experiment_name = r'$\alpha$'
+            mathed_experiment_name = r'$\alpha_0$'
         else:
             mathed_experiment_name = experiment_name
 
