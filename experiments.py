@@ -42,6 +42,31 @@ def run_experiment(s, name, description, datafile):
 			#finally, store everything
 			json.dump(output, outfile)
 
+
+############################################################################################
+###################    Experiment 7: PYP varying alpha and beta      ######################
+############################################################################################
+
+basename = 'exp07-PYP'
+description = 'DP algorithm with same temp regime as PYP'
+datafile = __DEFAULT_DATAFILE__
+
+alphas = [1, 2, 5, 10, 20, 50, 100, 500]
+
+for alpha in alphas:
+
+	name = basename + '-alpha-' + `alpha`
+
+	#Initilize the corpus with the right paramters
+	s = DP_word_segmentation_model(datafile, temp_regime_id=3)
+	s.alpha = alpha
+
+	#initilize the boundaries
+	s.initialize_boundaries_randomly()
+
+	run_experiment(s, name, description, datafile)
+
+
 ############################################################################################
 ###################    Experiment 6: PYP varying alpha and beta      ######################
 ############################################################################################
@@ -50,8 +75,8 @@ basename = 'exp06-PYP'
 description = 'PYP algorithm with different alpha an beta combination'
 datafile = __DEFAULT_DATAFILE__
 
-alphas = [1, 5, 10, 50, 100, 500]
-betas = [0.2, 0.4,0.6, 0.8, 1, 0]
+alphas = [1, 2, 5, 10, 20, 50, 100, 500]
+betas = [0.01, 0.1, 0.2, 0.4,0.6, 0.8, 1, 0]
 
 for alpha in alphas:
 	for beta in betas:
