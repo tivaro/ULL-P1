@@ -56,17 +56,17 @@ betas = [0.2, 0.4,0.6, 0.8, 1, 0]
 for alpha, in alphas:
 	for beta in betas:
 		
-	name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
+		name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
 
-	#Initilize the corpus with the right paramters
-	s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
-	s.alpha = alpha
-	s.beta  = beta
+		#Initilize the corpus with the right paramters
+		s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
+		s.alpha = alpha
+		s.beta  = beta
 
-	#initilize the boundaries
-	s.initialize_boundaries_randomly()
+		#initilize the boundaries
+		s.initialize_boundaries_randomly()
 
-	run_experiment(s, name, description, datafile)
+		run_experiment(s, name, description, datafile)
 
 
 ############################################################################################
