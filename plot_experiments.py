@@ -1,20 +1,23 @@
 import json
 import os
 import matplotlib.pyplot as plt
+import matplotlib
 """
 This script makes plots from all files in the "results" folder,
 grouped by experiment type.
 It seperates filenames on the "-" character.
 
-If the last part is a number, it makes seperate plots for precision, recall 
-and F0, with the last number on the x-axis (for example, a results folder 
-containing "exp02-alpha-1.json" and "exp02-alpha-2.json" would make 9 plots 
-with alpha on the x-axis and precision, either precision, recall or f0 on the 
+If the last part is a number, it makes seperate plots for precision, recall
+and F0, with the last number on the x-axis (for example, a results folder
+containing "exp02-alpha-1.json" and "exp02-alpha-2.json" would make 9 plots
+with alpha on the x-axis and precision, either precision, recall or f0 on the
 y axes for each plot, done for words, boundaries and lexicons)
 
 If the last part is not a number, make 3 plots that plot performance on the
 y-axis and time on the x-axis. Each file will have its seperate line.
 """
+
+matplotlib.rcParams.update({'font.size': 14})
 
 def is_number(s):
     try:
@@ -74,24 +77,40 @@ for exp_type in experiments:
         """
         print 'making plots for ' + exp_type
         sorted_x = sorted(x_axis)
+
+        if experiment_name == 'p_dash':
+            mathed_experiment_name = r'$p_\#$'
+        elif experiment_name == 'alpha':
+            mathed_experiment_name = r'$\alpha$'
+        else:
+            mathed_experiment_name = experiment_name
+
         for k in precision:
             sorted_precision = [p for (x,p) in sorted(zip(x_axis,precision[k]))]
-            plt.plot(sorted_x, sorted_precision, marker='.')
-            plt.xlabel(experiment_name)
-            plt.ylabel('precision')
-            plt.savefig(plot_dir + experiment_name +'-'+ k +'-'+ 'precision.png')
-            plt.clf() #clear the plot figure
+            plt.plot(sorted_x, sorted_precision, marker='.', label=k)
+        plt.xlabel(mathed_experiment_name, fontsize=18)
+        plt.ylabel('Precision', fontsize=14)
+        plt.legend(loc='lower right')
+        plt.savefig(plot_dir + experiment_name + '-' + 'precision.eps', format='eps')
+        plt.clf() #clear the plot figure
 
+        for k in recall:
             sorted_recall = [r for (x,r) in sorted(zip(x_axis,recall[k]))]
-            plt.plot(sorted_x, sorted_recall, marker='.')
-            plt.ylabel('recall')
-            plt.savefig(plot_dir + experiment_name +'-'+ k +'-'+ 'recall.png')
-            plt.clf() #clear the plot figure
+            plt.plot(sorted_x, sorted_recall, marker='.', label=k)
+        plt.xlabel(mathed_experiment_name, fontsize=18)
+        plt.ylabel('Recall', fontsize=14)
+        plt.legend(loc='lower right')
+        plt.savefig(plot_dir + experiment_name + '-' + 'recall.eps', format='eps')
+        plt.clf() #clear the plot figure
 
+        for k in f0:
             sorted_f0 = [f for (x,f) in sorted(zip(x_axis,f0[k]))]
-            plt.plot(sorted_x, sorted_f0, marker='.')
-            plt.ylabel('f0')
-            plt.savefig(plot_dir + experiment_name +'-'+ k +'-'+ 'f0.png')
-            plt.clf() #clear the plot figure
+            plt.plot(sorted_x, sorted_f0, marker='.', label=k)
+        plt.xlabel(mathed_experiment_name, fontsize=18)
+        plt.ylabel('F0', fontsize=14)
+        plt.legend(loc='lower right')
+        plt.savefig(plot_dir + experiment_name + '-' + 'f0.eps', format='eps')
+        plt.clf() #clear the plot figure
+
     else: #we have to plot performance over time (???)
         pass
