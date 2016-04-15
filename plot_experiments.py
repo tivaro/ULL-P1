@@ -112,5 +112,22 @@ for exp_type in experiments:
         plt.savefig(plot_dir + experiment_name + '-' + 'f0.eps', format='eps')
         plt.clf() #clear the plot figure
 
-    else: #we have to plot performance over time (???)
-        pass
+    else: #we have to plot log probabilities over time
+        print 'processing data for ' + exp_type
+        performance = {}
+        for file_name in file_list:
+            f = open('results/' + file_name + '.json', 'r')
+            print file_name
+            exp_output = json.load(f)
+            logs = exp_output['logs']
+            if 'P_corpus' in logs:
+                performance[str.split(file_name, '-')[-1]] = logs['P_corpus']
+
+        for k in performance:
+            x_axis = range(1, len(performance[k])+1)
+            plt.plot(x_axis, performance[k], label=k)
+        plt.xlabel(experiment_name, fontsize=18)
+        plt.ylabel('Log prob', fontsize=14) #TODO find a better name for this
+        plt.legend(loc='lower right')
+        plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
+        plt.clf() #clear the plot figure
