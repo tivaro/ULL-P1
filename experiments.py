@@ -53,8 +53,8 @@ datafile = __DEFAULT_DATAFILE__
 alphas = [1, 5, 10, 50, 100, 500]
 betas = [0.2, 0.4,0.6, 0.8, 1, 0]
 
-for temp_regime in temp_regimes:
-	name = basename + '-alpha-' + `alpha` + '-beta-' + beta
+for alpha, beta in zip(alphas, betas):
+	name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
 
 	#Initilize the corpus with the right paramters
 	s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
@@ -65,7 +65,7 @@ for temp_regime in temp_regimes:
 	s.initialize_boundaries_randomly()
 
 	run_experiment(s, name, description, datafile)
-				
+
 
 ############################################################################################
 ########################    Experiment 1: different P0 methods     #########################
