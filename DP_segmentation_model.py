@@ -76,7 +76,7 @@ class DP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 		pws = []
 
 		for word, count in self.word_counts.iteritems():
-			pws.append(count * (np.log(1.0 * (count - 1 + self.alpha * self.P0(word)))
+			pws.append(count * (np.log(count - 1 + (self.alpha * self.P0(word)))
 								- np.log(self.total_word_count - 1 + self.alpha)
 								) ) 
 		return sum(pws)
@@ -106,13 +106,6 @@ class DP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 			w1 = utterance[prev_b:next_b]
 			w2 = w1[:boundary-prev_b]
 			w3 = w1[boundary-prev_b:]
-
-			if debug:
-				print "     " + " " * (boundary - 1 + insert_boundary_at - boundary_exists) + 'V' + ' ' * int(boundary_exists) + 'V'
-				print "utt: " + word_segmentation.insert_boundaries(utterance, boundaries)
-				print "w1: " + w1
-				print "w2: " + w2
-				print "w3: " + w3
 
 			# calculate the word counts over all the OTHER words,
 			# this means that we should substract the counts for the part under consideration (w1)
@@ -145,6 +138,11 @@ class DP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 			insert_boundary = mu > random()
 
 			if debug:
+				print "     " + " " * (boundary - 1 + insert_boundary_at) + 'V' + ' ' * int(boundary_exists) + 'V'
+				print "utt: " + word_segmentation.insert_boundaries(utterance, boundaries)
+				print "w1: " + w1
+				print "w2: " + w2
+				print "w3: " + w3
 				print 'p( B):', p_boundary, '*' * int(insert_boundary)
 				print 'p(-B):', p_no_boundary, '*' * int(not insert_boundary)
 				print ' (mu=', mu, ')'
