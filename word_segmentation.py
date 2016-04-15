@@ -15,7 +15,7 @@ class Word_segmentation_model(object):
 	__version__ = 0.8
 
 	#parameters
-	temp_regime = (20000, np.arange(0.1,1.1,0.1)) #temperature steps for gibbs sampling (annealing) in a tuple (total_iterations, regime)
+	temp_regime = (0,0) #temperature steps for gibbs sampling (annealing) in a tuple (total_iterations, regime)
 	rho = 2 #parameter of beta prior over utterance end
 	p_dash = 0.5 #probability of ending a word (in P_0)
 
@@ -54,6 +54,7 @@ class Word_segmentation_model(object):
 		temp_regimes.append([20000, np.arange(0.1,1.1,0.1)])
 		temp_regimes.append([30000, np.arange(0.1,1.6,0.1)])
 		temp_regimes.append([40000, np.arange(0.002,1.002,0.002)])
+		temp_regimes.append([3999, np.arange(0.1,1.6,0.5)])
 		self.temp_regime = temp_regimes[temp_regime_id]
 		#compute the time steps when we have to change temperatures
 		self.temp_regime.append(int(self.temp_regime[0]/len(self.temp_regime[1])))
