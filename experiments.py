@@ -53,7 +53,9 @@ datafile = __DEFAULT_DATAFILE__
 alphas = [1, 5, 10, 50, 100, 500]
 betas = [0.2, 0.4,0.6, 0.8, 1, 0]
 
-for alpha, beta in zip(alphas, betas):
+for alpha, in alphas:
+	for beta in betas:
+		
 	name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
 
 	#Initilize the corpus with the right paramters
