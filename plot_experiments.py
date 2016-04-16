@@ -72,14 +72,14 @@ for exp_type in experiments:
 
 
         for file_name in file_list:
-            x_axis.append(float(str.split(file_name, '-')[-1]))
+
             f = open('results/' + file_name + '.json', 'r')
             print file_name
             exp_output = json.load(f)
             evaluation = exp_output['evaluation']
 
-            betas.append( str.split(file_name, '-')[-1])
-            alphas.append(str.split(file_name, '-')[-3])
+            betas.append( float( str.split(file_name, '-')[-1]) )
+            alphas.append(float( str.split(file_name, '-')[-3]) )
 
             #print evaluation
             for k in evaluation:
@@ -89,29 +89,106 @@ for exp_type in experiments:
 
         print 'making plots for ' + exp_type
 
-        measure = np.array(precision['boundaries'])
 
-        #tweak the values a littlebit for the size of the markers
-        #size_scale = -1.0 / np.log(measure)
-        #size_scale = 300 * size_scale
-        size_scale = 800 * measure
-        
+        evaluation = {'precision': precision,
+                    'recall': recall,
+                    'F0': f0}
 
-        plt.scatter(alphas, betas, c=measure, s=size_scale)
-        plt.xscale('log')
-        plt.xlabel(r'$\alpha$')
-        plt.ylabel(r'$\beta$')
-        plt.clim(0,1)
-        plt.colorbar()
-        plt.savefig(plot_dir +  'exp06.eps', format='eps')
-        plt.clf() #clear the plot figure                
+        for x in evaluation.keys():
+            plt.figure(figsize=(20, 6))
+
+            for i, k in enumerate(precision.keys()):
+
+                plt.subplot(1,3,i + 1)
+                plt.title(k)
+                m = np.array(evaluation[x][k])
+
+                #tweak the values a littlebit for the size of the markers
+                size_scale = 800 * m
+                
+
+                plt.scatter(alphas, betas, c=m, s=size_scale)
+                plt.xscale('log')
+                plt.xlabel(r'$\alpha$')
+                plt.clim(0,1)
+
+                if i == 0: plt.ylabel(r'$\beta$')
+                if (i + 1) == len(precision): plt.colorbar()
+
+            plt.suptitle(x)
+            plt.savefig(plot_dir + 'PYP-' + x + '.eps', format='eps')
+            plt.clf() #clear the plot figure
+
+            #store for the next plot
+            exp06 = {}
+            exp06['evaluation'] = evaluation
+            exp06['alphas'] = alphas
+            exp06['betas']  = betas
         
 
 
     elif exp_type =='exp07':
-        print 'JOW7'
+        print 'Subselecting data from exp06'
+        #select only experiments where beta = 0
+        useInds = np.where(np.asarray(exp06['betas']) == 0)[0]
+    
+        #get correspondint alphas and sort alphas and indices
+        alphas = np.array(exp06['alphas'])[useInds]
+        alphas, useInds = zip(*sorted(zip(alphas,useInds)))
+        useInds = list(useInds)
 
-    #Check if we have to plot numbers on the x-axis    
+        #Now select beta and sort for all measurements
+        PYP = {'evaluation':{},
+               'alphas':list(alphas)}
+        for key, value in exp06['evaluation'].iteritems():
+
+            PYP['evaluation'][key] = {}
+            for a,b in value.iteritems():
+                PYP['evaluation'][key][a] = np.array(b)[useInds]
+
+
+        #load data for exp07
+        evaluation = {'precision' : {},
+                      'recall' : {},
+                      'F0' : {}}
+        colors = {'boundaries':'b','lexicon':'g','words':'r'}
+        alphas = []
+        #this will store the values on the x-axis
+        #gather all the values
+        for file_name in file_list:
+            alphas.append(float(str.split(file_name, '-')[-1]))
+            f = open('results/' + file_name + '.json', 'r')
+            print file_name
+            exp_output = json.load(f)
+            cur_eval = exp_output['evaluation']
+            #print evaluation
+            for k in cur_eval:
+                append_to_dict(evaluation['precision'], k, cur_eval[k][0])
+                append_to_dict(evaluation['recall'], k, cur_eval[k][1])
+                append_to_dict(evaluation['F0'], k, cur_eval[k][2])
+
+        print 'making plots for exp07'
+        for measure in evaluation.keys():
+            plt.figure()
+            sorted_x = sorted(alphas)
+            for k in precision:
+                sorted_y = [p for (x,p) in sorted(zip(alphas,evaluation[measure][k]))]
+                plt.plot(sorted_x, sorted_y,                marker='.', label='DP ' + k, c=colors[k])
+                plt.plot(PYP['alphas'], PYP['evaluation'][measure][k], marker='.', label='PYP ' + k, c=colors[k],linestyle='--')
+
+            plt.xlabel(r'$\alpha$', fontsize=18)
+            plt.ylabel(measure, fontsize=14)
+            plt.ylim([0, 1])
+            plt.legend(loc='lower right')
+            plt.savefig(plot_dir + 'DP-vs-PYP' + '-' + measure + '.eps', format='eps')
+        plt.clf() #clear the plot figure          
+
+
+
+    #Check if we have to plot numbers on the x-axis
+    elif True:
+        print 'LOl'
+
     elif is_number(str.split(file_list[0], '-')[-1]):
         print 'processing data for ' + exp_type
         precision = {}

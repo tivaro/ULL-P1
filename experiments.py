@@ -30,7 +30,7 @@ def run_experiment(s, name, description, datafile):
 			output['version'] = s.__version__
 
 			# run the sampler
-			logs = s.gibbs_sampler(log=['P_corpus', 'n_types', 'n_tokens','temperature'])
+			logs = s.gibbs_sampler(log=['P_corpus', 'n_types', 'n_tokens','temperature','K'])
 
 			# Store the obtained data
 			output['logs'] 		 = logs
@@ -38,6 +38,11 @@ def run_experiment(s, name, description, datafile):
 
 			#store the boundaries, given the datafile, this is the segementation of the lexicon
 			output['boundaries'] = s.boundaries
+
+			try:
+				output['seating'] = s.seating
+			except:
+				pass
 
 			#finally, store everything
 			json.dump(output, outfile)
