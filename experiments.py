@@ -10,7 +10,7 @@ __STORE_FOLDER__ = 'results/'
 
 def run_experiment(s, name, description, datafile):
 	"""
-	LOL
+	This function runs a custom experiment
 	"""
 
 	outfile = __STORE_FOLDER__ + name +'.json'
@@ -44,58 +44,6 @@ def run_experiment(s, name, description, datafile):
 
 
 ############################################################################################
-###################    Experiment 7: PYP varying alpha and beta      ######################
-############################################################################################
-
-basename = 'exp07-PYP'
-description = 'DP algorithm with same temp regime as PYP'
-datafile = __DEFAULT_DATAFILE__
-
-alphas = [1, 2, 5, 10, 20, 50, 100, 500]
-
-for alpha in alphas:
-
-	name = basename + '-alpha-' + `alpha`
-
-	#Initilize the corpus with the right paramters
-	s = DP_word_segmentation_model(datafile, temp_regime_id=3)
-	s.alpha = alpha
-
-	#initilize the boundaries
-	s.initialize_boundaries_randomly()
-
-	run_experiment(s, name, description, datafile)
-
-
-############################################################################################
-###################    Experiment 6: PYP varying alpha and beta      ######################
-############################################################################################
-
-def exp06():
-	basename = 'exp06-PYP'
-	description = 'PYP algorithm with different alpha an beta combination'
-	datafile = __DEFAULT_DATAFILE__
-
-	alphas = [1, 2, 5, 10, 20, 50, 100, 500]
-	betas = [0.01, 0.1, 0.2, 0.4,0.6, 0.8, 1, 0]
-
-	for alpha in alphas:
-		for beta in betas:
-
-			name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
-
-			#Initilize the corpus with the right paramters
-			s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
-			s.alpha = alpha
-			s.beta  = beta
-
-			#initilize the boundaries
-			s.initialize_boundaries_randomly()
-
-			run_experiment(s, name, description, datafile)
-
-
-############################################################################################
 ########################    Experiment 1: different P0 methods     #########################
 ############################################################################################
 
@@ -116,7 +64,7 @@ def exp01():
 	
 	name = basename + '-uniform'
 	
-	#Initilize the corpus with the right paramters
+	#Initialize the corpus with the right paramters
 	s = DP_word_segmentation_model(datafile,P0_method='uniform')
 	
 	#initialize the boundaries
@@ -137,7 +85,7 @@ def exp02():
 	for alpha in alphas:
 		name = basename + `alpha`
 
-		#Initilize the corpus
+		#Initialize the corpus
 		s = DP_word_segmentation_model(datafile)
 
 		# set the right paramter
@@ -161,7 +109,7 @@ def exp03():
 	for p_dash in p_dashes:
 		name = basename + `p_dash`
 
-		#Initilize the corpus
+		#Initialize the corpus
 		s = DP_word_segmentation_model(datafile)
 
 		# set the right paramter
@@ -184,7 +132,7 @@ def exp04():
 
 	#####################    Experiment 4: different values of p_dash    ########################
 	name = basename + 'true_init'
-	#Initilize the corpus
+	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
 
 	#dont initialise the boundaries
@@ -193,7 +141,7 @@ def exp04():
 	#####################    Experiment 4: different values of p_dash    ########################
 	name = basename + 'no_init'
 
-	#Initilize the corpus
+	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
 
 	#remove all boundaries
@@ -204,7 +152,7 @@ def exp04():
 	#####################    Experiment 4: different values of p_dash    ########################
 	name = basename + 'random_0.33_init'
 
-	#Initilize the corpus
+	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
 
 	#initialize randomly
@@ -215,7 +163,7 @@ def exp04():
 	#####################    Experiment 4: different values of p_dash    ########################
 	name = basename + 'random_0.66_init'
 
-	#Initilize the corpus
+	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
 
 	#initialize randomly
@@ -226,7 +174,7 @@ def exp04():
 	#####################    Experiment 4: different values of p_dash    ########################
 	name = basename + 'all_init'
 
-	#Initilize the corpus
+	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
 
 	#initialize with all possible boundaries
@@ -248,18 +196,125 @@ def exp05():
 	for temp_regime in temp_regimes:
 		name = basename + `temp_regime`
 
-		#Initilize the corpus with the right paramters
+		#Initialize the corpus with the right paramters
 		s = DP_word_segmentation_model(datafile,temp_regime_id=temp_regime)
 
 		#initilize the boundaries
 		s.initialize_boundaries_randomly()
 
-		run_experiment(s, name, description, datafile
+		run_experiment(s, name, description, datafile)
+
+
+############################################################################################
+###################    Experiment 6: PYP varying alpha and beta      ######################
+############################################################################################
+
+def exp06():
+	basename = 'exp06-PYP'
+	description = 'PYP algorithm with different alpha an beta combination'
+	datafile = __DEFAULT_DATAFILE__
+
+	alphas = [1, 2, 5, 10, 20, 50, 100, 500]
+	betas = [0.01, 0.1, 0.2, 0.4,0.6, 0.8, 1, 0]
+
+	for alpha in alphas:
+		for beta in betas:
+
+			name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
+
+			#Initialize the corpus with the right paramters
+			s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
+			s.alpha = alpha
+			s.beta  = beta
+
+			#initilize the boundaries
+			s.initialize_boundaries_randomly()
+
+			run_experiment(s, name, description, datafile)
+
+
+############################################################################################
+###################    Experiment 7: PYP varying alpha and beta      ######################
+############################################################################################
+
+def exp07():
+	basename = 'exp07-PYP'
+	description = 'DP algorithm with same temp regime as PYP'
+	datafile = __DEFAULT_DATAFILE__
+
+	alphas = [1, 2, 5, 10, 20, 50, 100, 500]
+
+	for alpha in alphas:
+
+		name = basename + '-alpha-' + `alpha`
+
+		#Initialize the corpus with the right paramters
+		s = DP_word_segmentation_model(datafile, temp_regime_id=3)
+		s.alpha = alpha
+
+		#initilize the boundaries
+		s.initialize_boundaries_randomly()
+
+		run_experiment(s, name, description, datafile)
+
 
 if __name__ == '__main__':
-	exp06()
-	exp01()
-	exp02()
-	exp03()
-	exp04()
-	exp05()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--runall', help="""runs all experiments that were detailed in the report
+			     Can not be used in combination with other parameters.""")
+	parser.add_argument('--cf', help='corpus file')
+	parser.add_argument('--t', help='temperature regime. will also influence the amount of iterations.')
+	parser.add_argument('--p_0', help='p_0')
+	parser.add_argument('--a', help='alpha_0')
+	parser.add_argument('--b', help='beta_0. Only used for PYP experiments')
+	parser.add_argument('--p_dash', help='p_dash')
+	parser.add_argument('--init', help="""Initialization. valid options are \n 
+			    'true_init': initializes algorithm with the correct boundaries \n
+			    'no_init': initializes without boundaries \n
+			    'random_0.33_init': initialize 1/3 of the boundaries randomly \n
+			    'random_0.66_init': initialize 1/3 of the boundaries randomly \n
+			    'all_init': initialize all of the boundaries randomly
+			    """)
+	parser.parse_args()
+	if runall:
+		exp07()
+		exp06()
+		exp01()
+		exp02()
+		exp03()
+		exp04()
+		exp05()
+	else:
+		corpusfile = 'br-phono-train.txt'
+		temp_regime_id = 0
+		P0_method='uniform'
+		initialization = 'true_init'
+		if cf:
+			corpusfile = cf
+		if t:
+			temp_regime_id= t
+		if p_0:
+			P0_method= p_0
+		if b:
+			s = PYP_word_segmentation_model(corpus_file, temp_regime_id, P0_method)
+			s.beta = b 
+		else:
+			s = DP_word_segmentation_model(corpus_file, temp_regime_id, P0_method)
+		if a:
+			s.alpha = a
+		if p_dash:
+			s.p_dash = p_dash
+		if init:
+			if init == 'true_init':
+				pass
+			if init == 'no_init':
+				s.remove_all_boundaries()
+			elif init == 'random_0.33_init':
+				s.initialize_boundaries_randomly(1.0 / 3)
+			elif init == 'random_0.66_init':
+				s.initialize_boundaries_randomly(2.0 / 3)
+			elif init == 'all_init':
+				s.initialize_boundaries_randomly(1.0)
+			else:
+				raise Exception('incorrect init argument')
+		run_experiment(s, 'custom experiment', '', corpus_file)
