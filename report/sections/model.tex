@@ -1,1 +1,108 @@
 \section{Model}
+
+\subsection{DP model}
+
+\begin{align}
+P(z_i=k|\zmin) = 
+\begin{cases}
+    \frac{n_K^{(\zmin})}{i - 1 - \alpha},& 1 \le k \le K(\zmin)\\
+    \frac{\alpha}{i - 1 - \alpha}              & k = K(\zmin)\\
+\end{cases}
+\end{align}
+
+\subsection{PYP Model}
+\subsubsection{Model definitions}
+
+The probabilities of the seating according to the PYP are:
+
+\begin{align}
+P(z_i=k|\zmin) = 
+\begin{cases}
+    \frac{n_K^{(\zmin}) - \beta}{i - 1 - \alpha},& 1 \le k \le K(\zmin)\\
+    \frac{\alpha + \beta K}{i - 1 - \alpha}              & k = K(\zmin)\\
+\end{cases}
+\end{align}
+
+Now we include the label and the base distribution $P_0$ in the model:
+
+\begin{align}
+p(w_i=\ell|\zmin,\vt{\ell}(\zmin),\alpha) &= \sum_{k=1}^{K(\zmin)}\mathcal{I}(\ell_k=\ell)\dfrac{n_k^{(\zmin)}-\beta}{i - 1 + \alpha} + P_0(\ell)\dfrac{\alpha + \beta K}{i -1 -\alpha} \\
+&= \dfrac{n_{\ell}^{(\wmin)}- n_{\ell}^{\vt{\ell}(\zmin)}\beta}{i - 1 + \alpha} + P_0(\ell)\dfrac{\alpha + \beta K}{i -1 -\alpha} \\
+&= \dfrac{P_0(\ell)\alpha + n_{\ell}^{(\wmin)}+ \beta (K - n_{\ell}^{\vt{\ell}(\zmin)})}{i - 1 + \alpha} 
+\end{align}
+
+Where $n_{\ell}^{(\wmin)}$ is the number of times the label $\ell$ occurs in the segmented corpus and $n_{\ell}^{\vt{\ell}(\zmin)}$ is the number of tables where label $\ell$ occurs.
+
+\subsubsection{Inference}
+
+For gibs sampling, we pick a random boundary and propose two hypothesis:
+\\
+$h_1$: There is no boundary at this location \\
+$h_2$: There is a boundary at this location
+
+
+$h^-$ denotes the set of words and seating arrangement shared by the both hypothesis.
+
+In order to find $h^-$, we remove the word (or words) from 
+
+\begin{align}
+P(h_1 | h^-) &= P(w_1|h^-)P(u_{w_1} | h^{-}) \\
+&= \dfrac{P_0(w_1)\alpha + n_{w_1}^{(\wmin)}+ \beta (K - n_{w_1}^{\vt{\ell}(\zmin)})}{n^- + \alpha}
+\dfrac{n_u^{(h^-)} + \frac{\rho}{2}}{n^- + \rho}
+\end{align}
+
+\begin{align}
+P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
+=&P(w_2|h^-)P(u_{w_2}|h^1)P(w_3 | w_2,h^-)P(u_{w_3}|u_{w_2}|h^-) \\
+=& \dfrac{P_0(w_2)\alpha + n_{w_2}^{(\wmin)}+ \beta (K - n_{w_2}^{\vt{\ell}(\zmin)})}{n^- + \alpha}
+\dfrac{n^- - n_\$^{(h^-)} + \frac{\rho}{2}}{n^- + \rho} \\
+&\cdot 
+\dfrac{P_0(w_3)\alpha + n_{w_3}^{(\wmin)}+ \mathcal{I}(w_2 = w_3) \beta (K - n_{w_3}^{\vt{\ell}(\zmin)})}{n^- + \alpha + 1} \\
+&\cdot
+\dfrac{n_u^{(h^-)} + \mathcal{I}(w_2 = w_3)  + \frac{\rho}{2}}{n^- + 1 + \rho}
+\end{align}
+
+\begin{algorithm}
+\caption{Pseudo algorithm}\label{euclid}
+\begin{algorithmic}[1]
+\Procedure{PYP Inference}{}
+\BState \emph{Initialisation}:
+\State $\textit{segmentation} \gets \text{initialise randomly}$
+\State $seating \gets \emptyset$
+\For{all words $w_i$ in segmentation}
+	\State {addCustomer($w_i$)}
+\EndFor
+\\
+\BState \emph{Gibbs Sampling}:
+\For{all possible boundaries $b_i$}
+	\State $w_1 \gets$ word if boundary is not placed (h1)
+	\State $w_2, w_3 \gets$ word if boundary is  placed (h2)
+	\\
+	\If {boundary $b_i$ currently exists}
+		\State removeCustomer($w_2$)
+		\State removeCustomer($w_3$)
+	\Else
+		\State removeCustomer($w_1$)	
+	\EndIf
+
+	\State calculate $p(h1)$
+	\State calculate $p(h2)$
+	
+	\State $insert\_boundary_i \gets$ sample proportionally
+	\\
+	\If{$insert\_boundary_i$}
+		\State addCustomer($w_2$)
+		\State addCustomer($w _3$)
+	\Else 
+		\State addCustomer($w_1$)	
+	\EndIf
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+	
+where addCustomer adds customers to a table proportional to (2) \\
+and removeCustomer selects one of the tables of the word, proportional to it's count. \\
+\\
+Both functions will also update K, and remove the tables if they have become empty
