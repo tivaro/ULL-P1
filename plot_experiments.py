@@ -2,6 +2,8 @@ import json
 import os
 import matplotlib.pyplot as plt
 import matplotlib
+import numpy as np
+
 """
 This script makes plots from all files in the "results" folder,
 grouped by experiment type.
@@ -52,15 +54,65 @@ for exp_type in experiments:
     experiment_name = str.split(file_list[0], '-')[1]
     experiment_print_name = experiment_name
     experiment_print_name = experiment_print_name.replace("_", " ")
-    experiment_print_name = experiment_print_name.replace("P dash", "$P_\$$")
+    experiment_print_name = experiment_print_name.replace("p dash", "$p_\$$")
     experiment_print_name = experiment_print_name.replace("alpha", r"$\alpha$")
-    experiment_print_name = experiment_print_name.replace("P0", "$P_0$")
+    experiment_print_name = experiment_print_name.replace("P0", "$P_0$")    
 
-    print experiment_name, experiment_print_name
     
+    # These experiments are somewhot different
+    if exp_type == 'exp06':
+        print 'processing data for ' + exp_type
+        alphas    = []
+        betas     = []
 
-    #Check if we have to plot numbers on the x-axis
-    if is_number(str.split(file_list[0], '-')[-1]):
+        precision = {}
+        recall    = {}
+        f0        = {}
+
+
+
+        for file_name in file_list:
+            x_axis.append(float(str.split(file_name, '-')[-1]))
+            f = open('results/' + file_name + '.json', 'r')
+            print file_name
+            exp_output = json.load(f)
+            evaluation = exp_output['evaluation']
+
+            betas.append( str.split(file_name, '-')[-1])
+            alphas.append(str.split(file_name, '-')[-3])
+
+            #print evaluation
+            for k in evaluation:
+                append_to_dict(precision, k, evaluation[k][0])
+                append_to_dict(recall, k, evaluation[k][1])
+                append_to_dict(f0, k, evaluation[k][2])
+
+        print 'making plots for ' + exp_type
+
+        measure = np.array(precision['boundaries'])
+
+        #tweak the values a littlebit for the size of the markers
+        #size_scale = -1.0 / np.log(measure)
+        #size_scale = 300 * size_scale
+        size_scale = 800 * measure
+        
+
+        plt.scatter(alphas, betas, c=measure, s=size_scale)
+        plt.xscale('log')
+        plt.xlabel(r'$\alpha$')
+        plt.ylabel(r'$\beta$')
+        plt.clim(0,1)
+        plt.colorbar()
+        plt.savefig(plot_dir +  'exp06.eps', format='eps')
+        plt.clf() #clear the plot figure                
+        
+
+
+    elif exp_type =='exp07':
+        print 'JOW7'
+
+    #Check if we have to plot numbers on the x-axis    
+    elif is_number(str.split(file_list[0], '-')[-1]):
         print 'processing data for ' + exp_type
         precision = {}
         recall = {}
