@@ -125,13 +125,13 @@ def exp03():
 ############################################################################################
 
 def exp04():
-	basename = 'exp04-'
+	basename = 'exp04-initialisation'
 	description = 'Trying different initialisations of the corpus'
 	datafile = __DEFAULT_DATAFILE__
 
 
 	#####################    Experiment 4: different values of p_dash    ########################
-	name = basename + 'true_init'
+	name = basename + 'true'
 	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
 
@@ -139,7 +139,7 @@ def exp04():
 	run_experiment(s, name, description, datafile)
 
 	#####################    Experiment 4: different values of p_dash    ########################
-	name = basename + 'no_init'
+	name = basename + '0%'
 
 	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
@@ -150,7 +150,7 @@ def exp04():
 	run_experiment(s, name, description, datafile)
 
 	#####################    Experiment 4: different values of p_dash    ########################
-	name = basename + 'random_0.33_init'
+	name = basename + '33%'
 
 	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
@@ -161,7 +161,7 @@ def exp04():
 	run_experiment(s, name, description, datafile)
 
 	#####################    Experiment 4: different values of p_dash    ########################
-	name = basename + 'random_0.66_init'
+	name = basename + '66%'
 
 	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
@@ -172,7 +172,7 @@ def exp04():
 	run_experiment(s, name, description, datafile)
 
 	#####################    Experiment 4: different values of p_dash    ########################
-	name = basename + 'all_init'
+	name = basename + '100%'
 
 	#Initialize the corpus
 	s = DP_word_segmentation_model(datafile)
@@ -188,7 +188,7 @@ def exp04():
 ############################################################################################
 
 def exp05():
-	basename = 'exp05-temp_regime'
+	basename = 'exp05-temperature-regime'
 	description = 'Using default parameters, varying temperature regime'
 	datafile = __DEFAULT_DATAFILE__
 	temp_regimes = range(3)

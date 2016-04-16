@@ -50,6 +50,15 @@ for f_name in os.listdir("results"):
 for exp_type in experiments:
     file_list = experiments[exp_type]
     experiment_name = str.split(file_list[0], '-')[1]
+    experiment_print_name = experiment_name
+    experiment_print_name = experiment_print_name.replace("_", " ")
+    experiment_print_name = experiment_print_name.replace("P dash", "$P_\$$")
+    experiment_print_name = experiment_print_name.replace("alpha", r"$\alpha$")
+    experiment_print_name = experiment_print_name.replace("P0", "$P_0$")
+
+    print experiment_name, experiment_print_name
+    
+
     #Check if we have to plot numbers on the x-axis
     if is_number(str.split(file_list[0], '-')[-1]):
         print 'processing data for ' + exp_type
@@ -78,18 +87,13 @@ for exp_type in experiments:
         print 'making plots for ' + exp_type
         sorted_x = sorted(x_axis)
 
-        if experiment_name == 'p_dash':
-            mathed_experiment_name = r'$p_\#$'
-        elif experiment_name == 'alpha':
-            mathed_experiment_name = r'$\alpha_0$'
-        else:
-            mathed_experiment_name = experiment_name
 
         for k in precision:
             sorted_precision = [p for (x,p) in sorted(zip(x_axis,precision[k]))]
             plt.plot(sorted_x, sorted_precision, marker='.', label=k)
-        plt.xlabel(mathed_experiment_name, fontsize=18)
+        plt.xlabel(experiment_print_name, fontsize=18)
         plt.ylabel('Precision', fontsize=14)
+        plt.ylim([0, 1])
         plt.legend(loc='lower right')
         plt.savefig(plot_dir + experiment_name + '-' + 'precision.eps', format='eps')
         plt.clf() #clear the plot figure
@@ -97,8 +101,9 @@ for exp_type in experiments:
         for k in recall:
             sorted_recall = [r for (x,r) in sorted(zip(x_axis,recall[k]))]
             plt.plot(sorted_x, sorted_recall, marker='.', label=k)
-        plt.xlabel(mathed_experiment_name, fontsize=18)
+        plt.xlabel(experiment_print_name, fontsize=18)
         plt.ylabel('Recall', fontsize=14)
+        plt.ylim([0, 1])
         plt.legend(loc='lower right')
         plt.savefig(plot_dir + experiment_name + '-' + 'recall.eps', format='eps')
         plt.clf() #clear the plot figure
@@ -106,11 +111,13 @@ for exp_type in experiments:
         for k in f0:
             sorted_f0 = [f for (x,f) in sorted(zip(x_axis,f0[k]))]
             plt.plot(sorted_x, sorted_f0, marker='.', label=k)
-        plt.xlabel(mathed_experiment_name, fontsize=18)
-        plt.ylabel('F0', fontsize=14)
+        plt.xlabel(experiment_print_name, fontsize=18)
+        plt.ylabel('$F_0$', fontsize=14)
+        plt.ylim([0, 1])
         plt.legend(loc='lower right')
         plt.savefig(plot_dir + experiment_name + '-' + 'f0.eps', format='eps')
         plt.clf() #clear the plot figure
+
 
     else: #we have to plot log probabilities over time
         print 'processing data for ' + exp_type
@@ -126,8 +133,9 @@ for exp_type in experiments:
         for k in performance:
             x_axis = range(1, len(performance[k])+1)
             plt.plot(x_axis, performance[k], label=k)
-        plt.xlabel(experiment_name, fontsize=18)
-        plt.ylabel('Log prob', fontsize=14) #TODO find a better name for this
-        plt.legend(loc='lower right')
+        plt.xlabel('iteration', fontsize=18)
+        plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
+        plt.legend(loc='lower right', title=experiment_print_name + ':')
+        plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
         plt.clf() #clear the plot figure
