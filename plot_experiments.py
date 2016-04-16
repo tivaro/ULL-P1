@@ -11,12 +11,15 @@ It seperates filenames on the "-" character.
 
 If the last part is a number, it makes seperate plots for precision, recall
 and F0, with the last number on the x-axis (for example, a results folder
-containing "exp02-alpha-1.json" and "exp02-alpha-2.json" would make 9 plots
-with alpha on the x-axis and precision, either precision, recall or f0 on the
-y axes for each plot, done for words, boundaries and lexicons)
+containing "exp02-alpha-1.json" and "exp02-alpha-2.json" would make 3 plots
+with alpha on the x-axis and either precision, recall or f0 on the
+y axes for each plot, done for words, boundaries and lexicons(so 3 lines per plot))
 
 If the last part is not a number, make 3 plots that plot performance on the
 y-axis and time on the x-axis. Each file will have its seperate line.
+
+Experiments 6 and 7 are different since they are experiments with PYP.
+Therefore these have their own plotting procedures.
 """
 
 matplotlib.rcParams.update({'font.size': 14})
@@ -59,7 +62,7 @@ for exp_type in experiments:
     experiment_print_name = experiment_print_name.replace("P0", "$P_0$")    
 
     
-    # These experiments are somewhot different
+    # These experiments are somewhat different
     if exp_type == 'exp06':
         print 'processing data for ' + exp_type
         alphas    = []
@@ -103,7 +106,7 @@ for exp_type in experiments:
                 plt.title(k)
                 m = np.array(evaluation[x][k])
 
-                #tweak the values a littlebit for the size of the markers
+                #tweak the values a little bit for the size of the markers
                 size_scale = 800 * m
                 
 
@@ -132,7 +135,7 @@ for exp_type in experiments:
         #select only experiments where beta = 0
         useInds = np.where(np.asarray(exp06['betas']) == 0)[0]
     
-        #get correspondint alphas and sort alphas and indices
+        #get corresponding alphas and sort alphas and indices
         alphas = np.array(exp06['alphas'])[useInds]
         alphas, useInds = zip(*sorted(zip(alphas,useInds)))
         useInds = list(useInds)
@@ -183,12 +186,6 @@ for exp_type in experiments:
             plt.savefig(plot_dir + 'DP-vs-PYP' + '-' + measure + '.eps', format='eps')
         plt.clf() #clear the plot figure          
 
-
-
-    #Check if we have to plot numbers on the x-axis
-    elif True:
-        print 'LOl'
-
     elif is_number(str.split(file_list[0], '-')[-1]):
         print 'processing data for ' + exp_type
         precision = {}
@@ -208,11 +205,6 @@ for exp_type in experiments:
                 append_to_dict(recall, k, evaluation[k][1])
                 append_to_dict(f0, k, evaluation[k][2])
         #plot the stuff and save it
-        """
-        print precision
-        print recall
-        print f0
-        """
         print 'making plots for ' + exp_type
         sorted_x = sorted(x_axis)
 

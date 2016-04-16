@@ -16,7 +16,7 @@ class DP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 
 	def initialize_lexicon(self, utterances, boundaries):
 
-		#first store the utterances an boundaries
+		#first store the utterances and boundaries
 		self.utterances = utterances
 		self.boundaries = boundaries
 

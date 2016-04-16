@@ -26,7 +26,7 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 
 	def initialize_lexicon(self, utterances, boundaries):
 
-		#first store the utterances an boundaries
+		#first store the utterances and boundaries
 		self.utterances = utterances
 		self.boundaries = boundaries
 
@@ -55,16 +55,16 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 			[self.add_customer(word) for word in word_or_words]
 		else:
 
-			# Calculate the probabilities for exisint tables accorinding to the PYP process 
+			# Calculate the probabilities for existing tables according to the PYP process 
 			tables = (self.seating[word_or_words] - self.beta).clip(min=0)
 
 			# Calculate the probability for a new table (append to beginnning)
 			tables = np.append(self.alpha + (self.beta * self.K), tables)
 
-			# Normalise probabilities
+			# Normalize probabilities
 			tables = tables / sum(tables)
 
-			# Pick a new / exisiting table
+			# Pick a new / existing table
 			table = np.random.choice(len(tables), 1, p=tables)
 
 			#print word_or_words, self.K, tables
@@ -147,7 +147,7 @@ class PYP_word_segmentation_model(word_segmentation.Word_segmentation_model):
 			w2 = w1[:boundary-prev_b]
 			w3 = w1[boundary-prev_b:]
 
-			# Remove the words that are not shared by the two hypothesis
+			# Remove the words that are not shared by the two hypotheses
 			if boundary_exists:
 				self.remove_customer([w2, w3])
 			else:
