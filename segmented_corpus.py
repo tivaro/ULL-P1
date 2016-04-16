@@ -3,7 +3,7 @@ from random import random
 from iProgressBar import ProgressBar
 import numpy as np
 import utils
-
+import argparse
 
 class segmented_corpus:
 	"""
@@ -469,7 +469,14 @@ def main():
 	#eval_demo()
 
 if __name__ == '__main__':
-	main()
-
-
-
+	#main()
+	__DEFAULT_DATAFILE__ = 'br-phono-train.txt'
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--corpus_file', help='corpus file')
+	parser.add_argument('--a', help='alpha_0')
+	parser.add_argument('--t', help='temperature regime. will also influence 
+	                                the amount of iterations.')
+	parser.add_argument('--r', help='rho')
+	parser.add_argument('--p_dash', help='p_dash')
+	parser.add_argument('--p_0', help='p_0')
+	args = parser.parse_args()

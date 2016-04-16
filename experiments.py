@@ -46,181 +46,195 @@ def run_experiment(s, name, description, datafile):
 ###################    Experiment 6: PYP varying alpha and beta      ######################
 ############################################################################################
 
-basename = 'exp06-PYP'
-description = 'PYP algorithm with different alpha an beta combination'
-datafile = __DEFAULT_DATAFILE__
+def exp06():
+	basename = 'exp06-PYP'
+	description = 'PYP algorithm with different alpha an beta combination'
+	datafile = __DEFAULT_DATAFILE__
 
-alphas = [1, 5, 10, 50, 100, 500]
-betas = [0.2, 0.4,0.6, 0.8, 1, 0]
+	alphas = [1, 5, 10, 50, 100, 500]
+	betas = [0.2, 0.4,0.6, 0.8, 1, 0]
 
-for alpha in alphas:
-	for beta in betas:
+	for alpha in alphas:
+		for beta in betas:
 
-		name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
+			name = basename + '-alpha-' + `alpha` + '-beta-' + `beta`
 
-		#Initilize the corpus with the right paramters
-		s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
-		s.alpha = alpha
-		s.beta  = beta
+			#Initilize the corpus with the right paramters
+			s = PYP_word_segmentation_model(datafile, temp_regime_id=3)
+			s.alpha = alpha
+			s.beta  = beta
 
-		#initilize the boundaries
-		s.initialize_boundaries_randomly()
+			#initilize the boundaries
+			s.initialize_boundaries_randomly()
 
-		run_experiment(s, name, description, datafile)
+			run_experiment(s, name, description, datafile)
 
 
 ############################################################################################
 ########################    Experiment 1: different P0 methods     #########################
 ############################################################################################
 
-basename = 'exp01-P0_method'
-description = 'MLE vs uniform P0'
-datafile = __DEFAULT_DATAFILE__
-
-name = basename + '-mle'
-
-#Initilize the courpus with the right paramters
-s = DP_word_segmentation_model(datafile,P0_method='mle')
-
-#initilize the boundaries
-s.initialize_boundaries_randomly()
-
-run_experiment(s, name, description, datafile)
-
-name = basename + '-uniform'
-
-#Initilize the courpus with the right paramters
-s = DP_word_segmentation_model(datafile,P0_method='uniform')
-
-#initilize the boundaries
-s.initialize_boundaries_randomly()
-
-run_experiment(s, name, description, datafile)
+def exp01():
+	basename = 'exp01-P0_method'
+	description = 'MLE vs uniform P0'
+	datafile = __DEFAULT_DATAFILE__
+	
+	name = basename + '-mle'
+	
+	#Initialize the corpus with the right paramters
+	s = DP_word_segmentation_model(datafile,P0_method='mle')
+	
+	#initialize the boundaries
+	s.initialize_boundaries_randomly()
+	
+	run_experiment(s, name, description, datafile)
+	
+	name = basename + '-uniform'
+	
+	#Initilize the corpus with the right paramters
+	s = DP_word_segmentation_model(datafile,P0_method='uniform')
+	
+	#initialize the boundaries
+	s.initialize_boundaries_randomly()
+	
+	run_experiment(s, name, description, datafile)
 
 ############################################################################################
 #####################    Experiment 2: different values of alpha    ########################
 ############################################################################################
 
-alphas = [1, 2, 5, 10, 20, 50, 100, 200, 500]
-basename = 'exp02-alpha-'
-description = 'Using default parameters, varying alpha'
-datafile = __DEFAULT_DATAFILE__
+def exp02():
+	alphas = [1, 2, 5, 10, 20, 50, 100, 200, 500]
+	basename = 'exp02-alpha-'
+	description = 'Using default parameters, varying alpha'
+	datafile = __DEFAULT_DATAFILE__
 
-for alpha in alphas:
-	name = basename + `alpha`
+	for alpha in alphas:
+		name = basename + `alpha`
 
-	#Initilize the courpus
-	s = DP_word_segmentation_model(datafile)
+		#Initilize the corpus
+		s = DP_word_segmentation_model(datafile)
 
-	# set the right paramter
-	s.alpha0 = alpha
+		# set the right paramter
+		s.alpha0 = alpha
 
-	#initilize the boundaries
-	s.initialize_boundaries_randomly()
+		#initilize the boundaries
+		s.initialize_boundaries_randomly()
 
-	run_experiment(s, name, description, datafile)
+		run_experiment(s, name, description, datafile)
 
 ############################################################################################
 #####################    Experiment 3: different values of p_dash    ########################
 ############################################################################################
 
-p_dashes = [0.1, 0.3, 0.5, 0.7, 0.9]
-basename = 'exp03-p_dash-'
-description = 'Using default parameters, varying p_dash'
-datafile = __DEFAULT_DATAFILE__
+def exp03():
+	p_dashes = [0.1, 0.3, 0.5, 0.7, 0.9]
+	basename = 'exp03-p_dash-'
+	description = 'Using default parameters, varying p_dash'
+	datafile = __DEFAULT_DATAFILE__
 
-for p_dash in p_dashes:
-	name = basename + `p_dash`
+	for p_dash in p_dashes:
+		name = basename + `p_dash`
 
-	#Initilize the courpus
-	s = DP_word_segmentation_model(datafile)
+		#Initilize the corpus
+		s = DP_word_segmentation_model(datafile)
 
-	# set the right paramter
-	s.p_dash = p_dash
+		# set the right paramter
+		s.p_dash = p_dash
 
-	#initilize the boundaries
-	s.initialize_boundaries_randomly()
+		#initilize the boundaries
+		s.initialize_boundaries_randomly()
 
-	run_experiment(s, name, description, datafile)
+		run_experiment(s, name, description, datafile)
 
 ############################################################################################
 #####################    Experiment 4: different initialisations    ########################
 ############################################################################################
 
-basename = 'exp04-'
-description = 'Trying different initialisations of the corpus'
-datafile = __DEFAULT_DATAFILE__
+def exp04():
+	basename = 'exp04-'
+	description = 'Trying different initialisations of the corpus'
+	datafile = __DEFAULT_DATAFILE__
 
 
-#####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'true_init'
-#Initilize the courpus
-s = DP_word_segmentation_model(datafile)
+	#####################    Experiment 4: different values of p_dash    ########################
+	name = basename + 'true_init'
+	#Initilize the corpus
+	s = DP_word_segmentation_model(datafile)
 
-#dont initialise the boundaries
-run_experiment(s, name, description, datafile)
+	#dont initialise the boundaries
+	run_experiment(s, name, description, datafile)
 
-#####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'no_init'
+	#####################    Experiment 4: different values of p_dash    ########################
+	name = basename + 'no_init'
 
-#Initilize the courpus
-s = DP_word_segmentation_model(datafile)
+	#Initilize the corpus
+	s = DP_word_segmentation_model(datafile)
 
-#remove all boundaries
-s.remove_all_boundaries()
+	#remove all boundaries
+	s.remove_all_boundaries()
 
-run_experiment(s, name, description, datafile)
+	run_experiment(s, name, description, datafile)
 
-#####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'random_0.33_init'
+	#####################    Experiment 4: different values of p_dash    ########################
+	name = basename + 'random_0.33_init'
 
-#Initilize the courpus
-s = DP_word_segmentation_model(datafile)
+	#Initilize the corpus
+	s = DP_word_segmentation_model(datafile)
 
-#initialize randomly
-s.initialize_boundaries_randomly(1.0 / 3)
+	#initialize randomly
+	s.initialize_boundaries_randomly(1.0 / 3)
 
-run_experiment(s, name, description, datafile)
+	run_experiment(s, name, description, datafile)
 
-#####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'random_0.66_init'
+	#####################    Experiment 4: different values of p_dash    ########################
+	name = basename + 'random_0.66_init'
 
-#Initilize the courpus
-s = DP_word_segmentation_model(datafile)
+	#Initilize the corpus
+	s = DP_word_segmentation_model(datafile)
 
-#initialize randomly
-s.initialize_boundaries_randomly(2.0 / 3)
+	#initialize randomly
+	s.initialize_boundaries_randomly(2.0 / 3)
 
-run_experiment(s, name, description, datafile)
+	run_experiment(s, name, description, datafile)
 
-#####################    Experiment 4: different values of p_dash    ########################
-name = basename + 'all_init'
+	#####################    Experiment 4: different values of p_dash    ########################
+	name = basename + 'all_init'
 
-#Initilize the courpus
-s = DP_word_segmentation_model(datafile)
+	#Initilize the corpus
+	s = DP_word_segmentation_model(datafile)
 
-#initialize with all possible boundaries
-s.initialize_boundaries_randomly(1.0)
+	#initialize with all possible boundaries
+	s.initialize_boundaries_randomly(1.0)
 
-run_experiment(s, name, description, datafile)
+	run_experiment(s, name, description, datafile)
 
 
 ############################################################################################
 ###################    Experiment 5: different temperature schemes    ######################
 ############################################################################################
 
-basename = 'exp05-temp_regime'
-description = 'Using default parameters, varying temperature regime'
-datafile = __DEFAULT_DATAFILE__
-temp_regimes = range(3)
+def exp05():
+	basename = 'exp05-temp_regime'
+	description = 'Using default parameters, varying temperature regime'
+	datafile = __DEFAULT_DATAFILE__
+	temp_regimes = range(3)
 
-for temp_regime in temp_regimes:
-	name = basename + `temp_regime`
+	for temp_regime in temp_regimes:
+		name = basename + `temp_regime`
 
-	#Initilize the corpus with the right paramters
-	s = DP_word_segmentation_model(datafile,temp_regime_id=temp_regime)
+		#Initilize the corpus with the right paramters
+		s = DP_word_segmentation_model(datafile,temp_regime_id=temp_regime)
 
-	#initilize the boundaries
-	s.initialize_boundaries_randomly()
+		#initilize the boundaries
+		s.initialize_boundaries_randomly()
 
-	run_experiment(s, name, description, datafile)
+		run_experiment(s, name, description, datafile
+
+if __name__ == '__main__':
+	exp06()
+	exp01()
+	exp02()
+	exp03()
+	exp04()
+	exp05()
