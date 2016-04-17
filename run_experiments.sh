@@ -5,7 +5,7 @@ module load python
 
 cd ~/ULL-P1
 
-srun -u python "experiments.py" && export subject="SUCCES :)" || export subject="FAILURE :("
+srun -u python "experiments.py" --runall && export subject="SUCCES :)" || export subject="FAILURE :("
 
 #Only mail the user once
 export file="emailed_user"

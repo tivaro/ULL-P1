@@ -245,7 +245,7 @@ def exp06():
 ############################################################################################
 
 def exp07():
-	basename = 'exp07-PYP'
+	basename = 'exp07-DP'
 	description = 'DP algorithm with same temp regime as PYP'
 	datafile = __DEFAULT_DATAFILE__
 
@@ -268,7 +268,7 @@ def exp07():
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 	parser.add_argument('--runall', help="""runs all experiments that were detailed in the report
-Can not be used in combination with other parameters.""", default=False)
+Can not be used in combination with other parameters.""", action='store_true')
 	parser.add_argument('--cf', help='corpus file', default='br-phono-train.txt')
 	parser.add_argument('--t', help='temperature regime. will also influence the amount of iterations.', type=int, default=0)
 	parser.add_argument('--p_0', help='p_0', type=str, default='uniform')
