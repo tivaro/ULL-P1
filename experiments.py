@@ -132,7 +132,7 @@ def exp03():
 ############################################################################################
 
 def exp04():
-	basename = 'exp04-initialisation'
+	basename = 'exp04-initialisation-'
 	description = 'Trying different initialisations of the corpus'
 	datafile = __DEFAULT_DATAFILE__
 
