@@ -157,7 +157,9 @@ for exp_type in experiments:
 
             plt.xlabel('iteration', fontsize=18)
             plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
-            plt.legend(loc='lower right', title=experiment_print_name + ':')
+            leg = plt.legend(loc='lower right', title=experiment_print_name + ':')
+            for legobj in leg.legendHandles:
+                legobj.set_linewidth(2.0)
             plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
         plt.clf() #clear the plot figure
@@ -306,7 +308,9 @@ for exp_type in experiments:
         plt.xlabel('iteration', fontsize=18)
         plt.xlim([0, x_axis[-1]])
         plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
-        plt.legend(loc='lower right', title=experiment_print_name + ':')
+        leg = plt.legend(loc='lower right', title=experiment_print_name + ':')
+        for legobj in leg.legendHandles:
+            legobj.set_linewidth(2.0)
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
         plt.clf() #clear the plot figure
