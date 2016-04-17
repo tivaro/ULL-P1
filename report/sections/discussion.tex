@@ -4,4 +4,13 @@ Overall, the outcomes of the experiments are underwhelming. In most cases, the e
 
 The results of our experiments do not directly match those of \cite{Goldwater200921}, but they are in the vicinity. We suspect that these differences may be caused by small implementation differences.
 
-\todo[inline]{DP vs PYP...}
+\todo[inline]{model is niet zo goed}
+Taken altogether, the DP unigram model does not perform very well on this task, in line with the findings of  \cite{Goldwater200921}. We suggested the PYP as an improvement to this model, but in fact, the PYP model worsened performance. Either the model and parameters were not implemented correctly, or the PYP model is actually not suited for this task. We did several experiments to investigate both options. With $\beta$ set to 0, the model behaves as the DP model, as expected. This indicates that the of modelling $h^-$ is implemented correctly. Another expected finding is that higher $\beta$ values result in an increased number of clusters ($K$). 
+
+The behaviour of the model with different values of $\beta$ indicate that some abnormalities. First of al, the lower the values of $\beta$, the lower the model performs. This contradicts the findings for $\beta = 0$, and may indicate an implementation error. The effect of $\beta$ on $K$ is as expected, larger $\beta$ values result in more clusters.
+The number of types increases with $\beta$, which means that not only do we have more clusters per type, but there also are more different labels. Surprisingly the number of tokens increases with $\beta$ as well. Taken together with the qualitative results, we conclude that the model does still under-segment but also makes many incorrect segmentations.
+
+The different values of $\beta$ also have a large effect on corpus probability, even after initialisation. This may mean indicate an implementation error and may be due to the fact that we defined the corpus probability as $p(\vt{w}|\vt{z})$ instead of including the distribution over $\vt{z}$. However the same probabilty is used in \cite{Goldwater200921} for the bigram model, which does converge nicely.
+ 
+ Besides implementation error, the PYP model may not be suited for this task. It could be the case that the distribution of types and tokens in infant directed language is distributed according to the power-law. In fact, this may very wel be the case, as vocabulary is rather limited. 
+ Furthermore, our findings may indicate that the assumption of this distribution over words is not suited for this clustering task in an ideal learner. However, more sanity checks and control experiments have to be conducted to find out what exactly is causing our results.
