@@ -24,7 +24,7 @@ $P_0$ is the prior distribution over phonemes. We experiment with a uniform dist
 
 \subsection{Gibbs sampling}
 
-The retrieved segmentation depends in part on the Gibbs sampling procedure. We experiment with different temperature regimes and initialization strategies. Like the choice of $P_0$ distribution, we evaluate the temperature regimes and initialization strategies using the log joint probabiliy over time.
+The retrieved segmentation depends in part on the Gibbs sampling procedure. We experiment with different temperature regimes and initialisation strategies. Like the choice of $P_0$ distribution, we evaluate the temperature regimes and initialisation strategies using the log joint probability over time.
 
 \subsubsection{Temperature regime}
 
@@ -36,9 +36,9 @@ We experimented with three different temperature regimes:
 \item Regime 2: 40000 iterations, from 0.002 to 1 in evenly spaced steps of 0.002
 \end{itemize}
 
-\subsubsection{Initialization}
+\subsubsection{Initialisation}
 
-We experiment with initialization with the true word boundaries as defined by the corpus as well as random boundary initialization. In the random initialization experiments, we first remove all boundaries and then randomly generate new boundaries. We experimented with different proportions of boundaries that were initialized with respect to the total number of possible boundaries (per utterance). We tested proportions $0$, $\frac{1}{3}$, $\frac{2}{3}$, $1$.
+We experiment with initialisation with the true word boundaries as defined by the corpus as well as random boundary initialisation. In the random initialisation experiments, we first remove all boundaries and then randomly generated new boundaries. We experimented with different proportions of boundaries that were initialised with respect to the total number of possible boundaries (per utterance). We tested proportions $0$, $\frac{1}{3}$, $\frac{2}{3}$, $1$. The default was set to random initialisation with a fraction of $\frac{2}{3}$, as this was close to the true proportion in the corpus (29%).
 
 \subsection{Model parameters}
 
@@ -46,13 +46,13 @@ The parameters of the DP model are $\alpha_0$, which affects the number of word 
 
 \subsection{PYP Model}
 
-Because $h^{-}$ has to be modeled explicitly in the PYP model, the sampling is computationally a lot more expensive than the sampler used in DP sampling. Therefore a different iteration scheme was used with only 4000 iterations, and three equal temperature steps (0.1, 1.1, 1.6).
+Because $h^{-}$ has to be modelled explicitly in the PYP model, the sampling is computationally a lot more expensive than the sampler used in DP sampling. Therefore a different iteration scheme was used with only 4000 iterations, and three equally long temperature steps (0.1, 1.1, 1.6).
 
 \subsubsection{Algorithm}
-Because the Gibbs sampling in the PYP model is slightly more complicated than the sampler for the DP model, some experiments were run, to test whether the sampler was implemented correctly.
-First, the PYP model was run with the $\beta$ parameter set to 0. The results were compared to the DP model with the exact same parameters and temperature regime. Both models were expected to produce the same results.
+Because of the different implementation of the Gibbs sampler in the PYP model, we first ran some control experiments, to confirm our implementation.
+The PYP model was run with the $\beta$ parameter set to 0 and the results were compared to the DP model with the exact same parameters and temperature regime. Both models were expected to produce the same results.
 
-Next, the probability of the corpus was calculated and examined after each iteration. If the sampler was implemented
+Next, we examined the corpus probability across iterations, to confirm that our Gibbs sampler was reaching an optimum.
 
 \subsubsection{Parameters}
-Both the concentration parameter $\alpha$ and the smoothing parameter $\beta$ effect the seating distribution and might therefore interact with each other. In order to find the best settings for $\alpha$ and $\beta$, a grid search was conducted with $\alpha \in \{1, 2, 5, 10, 20, 50, 100, 500 \}$ and $\beta \in \{ 0.01, 0.1, 0.2, 0.4,0.6, 0.8, 1, 0 \}$
+Both the concentration parameter $\alpha$ and the smoothing parameter $\beta$ affect the seating distribution. Because of this possible interaction, there might be no single best values for $\alpha$ and $\beta$. In order to find the best combination for both paramters, a grid search was conducted with $\alpha \in \{1, 2, 5, 10, 20, 50, 100, 500 \}$ and $\beta \in \{ 0.01, 0.1, 0.2, 0.4,0.6, 0.8, 1, 0 \}$

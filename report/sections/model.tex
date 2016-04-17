@@ -1,12 +1,9 @@
 \section{Model}
 
-\subsection{DP model}
-
-The probabilities of the seating according to the PYP are: \eqref{eq:DP}
 \subsection{PYP Model}
 \subsubsection{Model definitions}
 
-The probabilities of the seating according to the PYP are: \eqref{eq:PYP}
+The probabilities of the seating according to the PYP are given by \eqref{eq:PYP}.
 
 Now we include the label and the base distribution $P_0$ in the model:
 
@@ -20,16 +17,16 @@ Where $n_{\ell}^{(\wmin)}$ is the number of times the label $\ell$ occurs in the
 
 \subsubsection{Inference}
 
-For Gibbs sampling, we pick a random boundary and propose two hypothesis:
+Because the joint distribution is defined computationally complex, we use Gibbs sampling to find the maximum a posteriori segmentation.
+
+For Gibbs sampling, we pick a possible boundary location, and consider two hypothesis:
 \\
 $h_1$: There is no boundary at this location \\
 $h_2$: There is a boundary at this location
 
-
 $h^-$ denotes the set of words and seating arrangement shared by the both hypothesis.
 
-In order to find $h^-$, we remove the word (or words) from 
-
+The corresponding probabilities are:
 \begin{align}
 P(h_1 | h^-) &= P(w_1|h^-)P(u_{w_1} | h^{-}) \\
 &= \dfrac{P_0(w_1)\alpha + n_{w_1}^{(\wmin)}+ \beta (K - n_{w_1}^{\vt{\ell}(\zmin)})}{n^- + \alpha}
@@ -47,11 +44,11 @@ P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
 \dfrac{n_u^{(h^-)} + \mathcal{I}(w_2 = w_3)  + \frac{\rho}{2}}{n^- + 1 + \rho}
 \end{align}
 
-
+For the PYP model, we have to model $h^-$ explicitly, by removing words from the seating arrangement. The algorithm used is algorithm \ref{alg:PYP} where addCustomer adds customers to a table proportional to \eqref{eq:PYP} and removeCustomer selects one of the tables of the word, proportional to it's count. Both functions will also update K, and remove the tables if they have become empty.
 
 \begin{algorithm}[H]
 	\caption{Pseudo algorithm}
-    \label{alg:quad}
+    \label{alg:PYP}
     \nonl  \SetSideCommentLeft \emph{Initialization} \\
     $\textit{segmentation} \gets \text{initialize randomly}$ \\ 
     $seating \gets \emptyset$ \\
@@ -88,8 +85,9 @@ P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
 }
   \end{algorithm}
   
-  	
-where addCustomer adds customers to a table proportional to (2) \\
-and removeCustomer selects one of the tables of the word, proportional to it's count. \\
-\\
-Both functions will also update K, and remove the tables if they have become empty.
+\subsection{DP model}
+The PYP is an abstraction of the DP, and the corresponding expressions are therefore the same. Cancelling all terms of $\beta$ (or setting $\beta$ to 0) results in the expressions we used for the DP model. 
+
+The implementation of the DP model however, is significantly different from the PYP model. When integrating over the seating arrangements we can just sum the clusters with the same word. Therefore, there is no need to model $h^-$ exactly, we can instead just substract 1 from the corresponding counts.
+
+As a result, the DP model is very efficient compared to the PYP model
