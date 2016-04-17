@@ -26,6 +26,17 @@ Therefore these have their own plotting procedures.
 
 matplotlib.rcParams.update({'font.size': 14})
 
+def label(text):
+    conversions = {'P_corpus': '$\ln \ \ p(\mathbf{w})$',
+                    'n_types':'Types (n)',
+                    'n_tokens':'Tokens (n)',
+                    'K':'$K$'
+    }
+    try:
+        return conversions[text]
+    except:
+        return text
+
 def is_number(s):
     try:
         float(s)
@@ -144,7 +155,7 @@ for exp_type in experiments:
         for i, y  in enumerate(['P_corpus','n_types','n_tokens', 'K']):
 
             plt.subplot(1,4, i + 1)
-            plt.title(y)
+            plt.title(label(y))
 
             #lines, use nice colors
             for b, beta in enumerate(sorted(set(betas))):
@@ -163,13 +174,14 @@ for exp_type in experiments:
                     pass
 
 
-            plt.xlabel('iteration', fontsize=18)
-            plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
+                plt.xlabel('iteration', fontsize=18)
+            plt.ylabel(label(y), fontsize=14) #TODO find a better name for this
             if i == 3:
                 leg = plt.legend(loc='lower right')
                 for legobj in leg.legendHandles:
                     legobj.set_linewidth(2.0)
             plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+            plt.xticks(range(0,4001,1000))
         plt.savefig(plot_dir + experiment_name + '-' + 'iter_plots.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure
 
