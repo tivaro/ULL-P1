@@ -37,15 +37,11 @@ Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the
 
 \subsection{Model parameters}
 
-Figure \ref{fig:model_parameters} shows the effect of different model parameter choices on retrieval quality, evaluated on words, boundaries and the lexicon. The effect is mostly visible at the lexicon level, favouring higher values for both $\alpha_0$ and $p_\#$, but it does not seem to affect the retrieval quality of the words and boundaries much.
+Figure \ref{fig:model_parameters} shows the effect of different model parameter choices on the $F_0$-measure, evaluated on words, boundaries and the lexicon. The effect is mostly visible at the lexicon level, favouring higher values for both $\alpha_0$ and $p_\#$, but it does not seem to affect the $F_0$-measure of the words and boundaries much.
 
 \end{multicols}{2}
 \begin{figure}[!ht]
 \begin{tabular}{cccc}
-\subfloat[Precision for different values of $\alpha_0$]{\includegraphics[width=0.47\linewidth]{images/alpha-precision}} &
-\subfloat[Precision for different values of $p_\#$]{\includegraphics[width=0.47\linewidth]{images/p_dash-precision}} \\
-\subfloat[Recall for different values of $\alpha_0$]{\includegraphics[width=0.47\linewidth]{images/alpha-recall}} &
-\subfloat[Recall for different values of $p_\#$]{\includegraphics[width=0.47\linewidth]{images/p_dash-recall}}\\
 \subfloat[$F_0$ for different values of $\alpha_0$]{\includegraphics[width=0.47\linewidth]{images/alpha-f0}} &
 \subfloat[$F_0$ for different values of $p_\#$]{\includegraphics[width=0.47\linewidth]{images/p_dash-f0}}
 \end{tabular}
@@ -53,6 +49,21 @@ Figure \ref{fig:model_parameters} shows the effect of different model parameter 
 \label{fig:model_parameters}
 \end{figure}
 \begin{multicols}{2}
+
+Table \ref{tab:model_params} shows the retrieval quality of the model evaluated on words, boundaries and lexicon.
+
+\begin{table}[]
+\centering
+\caption{Retrieval quality of the model with $\alpha_0 = 20$ and $p_\# = 0.5$ evaluated on words, boundaries and lexicon.}
+\label{tab:model_params}
+\begin{tabular}{llll}
+\hline
+                    & \textbf{Precision} & \textbf{Recall} & {$\mathbf{F_0}$} \\ \hline
+\textbf{Words}      & 0.61               & 0.59            & 0.59          \\
+\textbf{Boundaries} & 0.59               & 0.51            & 0.53          \\
+\textbf{Lexicon}    & 0.50               & 0.48            & 0.49          \\ \hline
+\end{tabular}
+\end{table}
 
 %\FloatBarrier
 
