@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 from matplotlib import cm
+import colormaps as cmaps
 
 """
 This script makes plots from all files in the "results" folder,
@@ -113,7 +114,7 @@ for exp_type in experiments:
                 size_scale = 800 * m
                 
 
-                plt.scatter(alphas, betas, c=m, s=size_scale)
+                plt.scatter(alphas, betas, c=m, s=size_scale, cmap=cmaps.viridis)
                 plt.xscale('log')
                 plt.xlabel(r'$\alpha$')
                 plt.clim(0,1)
@@ -136,7 +137,7 @@ for exp_type in experiments:
         print 'making more plots for ' + exp_type 
         
         #subplot: word, word type, log p
-        colors = [ cm.jet(1.0 * x / len(set(betas))) for x in range(len(set(betas))) ]
+        colors = [ cmaps.viridis(1.0 * x / len(set(betas))) for x in range(len(set(betas))) ]
 
         for i, y  in enumerate(['P_corpus','n_types','n_tokens']):
 
@@ -280,6 +281,7 @@ for exp_type in experiments:
     else: #we have to plot log probabilities over time
         print 'processing data for ' + exp_type
         performance = {}
+
         for file_name in file_list:
             f = open('results/' + file_name + '.json', 'r')
             print file_name
@@ -288,10 +290,21 @@ for exp_type in experiments:
             if 'P_corpus' in logs:
                 performance[str.split(file_name, '-')[-1]] = logs['P_corpus']
 
-        for k in performance:
+        colors = [ cmaps.viridis(1.0 * x / len(performance)) for x in range(len(performance)) ]
+
+        #hack to get the legend in the right order for the initialisation experiment
+        keys = performance.keys()
+        if experiment_name == 'initialisation':
+            keys = ['true','100%','66%','33%','0%']
+
+        for i, k in enumerate(keys):
             x_axis = range(1, len(performance[k])+1)
-            plt.plot(x_axis, performance[k], label=k)
+            plt.plot(x_axis, performance[k], label=k, color=colors[i])
+            if experiment_name == 'initialisation':
+                dot = plt.scatter(0, performance[k][0], marker='o', color=colors[i],s=20)
+                dot.set_clip_on(False)
         plt.xlabel('iteration', fontsize=18)
+        plt.xlim([0, x_axis[-1]])
         plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
         plt.legend(loc='lower right', title=experiment_print_name + ':')
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
