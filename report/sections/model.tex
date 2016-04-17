@@ -48,48 +48,9 @@ P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
 \end{align}
 
 
-\begin{algorithm}
-\caption{Pseudo algorithm}\label{euclid}
-\begin{algorithmic}[1]
-\Procedure{PYP Inference}{}
-\BState \emph{Initialisation}:
-\State $\textit{segmentation} \gets \text{initialise randomly}$
-\State $seating \gets \emptyset$
-\For{all words $w_i$ in segmentation}{
-	\State {addCustomer($w_i$)}
-}
-\\
-\BState \emph{Gibbs Sampling}:
-\For{all possible boundaries $b_i$}{
-	\State $w_1 \gets$ word if boundary is not placed (h1)
-	\State $w_2, w_3 \gets$ word if boundary is  placed (h2)
-	\\
-	\lIf {boundary $b_i$ currently exists}{
-		\State removeCustomer($w_2$)
-		\State removeCustomer($w_3$)
-		}
-	\lElse{
-		\State removeCustomer($w_1$)	
-	}
-
-	\State calculate $p(h1)$
-	\State calculate $p(h2)$
-	
-	\State $insert\_boundary_i \gets$ sample proportionally
-	\\
-	\lIf{$insert\_boundary_i$}{
-		\State addCustomer($w_2$)
-		\State addCustomer($w _3$)
-		}
-	\lElse {
-		\State addCustomer($w_1$)	
-	}
-}
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
 
 \begin{algorithm}[H]
+	\caption{Pseudo algorithm}
     \label{alg:quad}
     \nonl  \SetSideCommentLeft \emph{Initialisation} \\
     $\textit{segmentation} \gets \text{initialise randomly}$ \\ 
@@ -99,9 +60,9 @@ P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
 	addCustomer($w_i$)
      } 
      
-     \nonl \SetSideCommentLeft \emph{Gibbs Sampling} \\
+     \nonl \SetSideCommentLeft \emph{Gibbs Sampling}
 
-\For{all possible boundaries $b_i$}{
+   \For{all possible boundaries $b_i$}{
 	$w_1 \gets$ word if boundary is not placed (h1) \\
 	$w_2, w_3 \gets$ word if boundary is  placed (h2) \\
 	\lIf {boundary $b_i$ currently exists}{
