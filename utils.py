@@ -1,5 +1,5 @@
 """
-This file contains some utility functions for loading corpuses, etc.
+This file contains some utility functions for loading corpuses, computing certain evaluations, etc. 
 """
 import re
 import numpy as np

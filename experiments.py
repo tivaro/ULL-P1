@@ -2,6 +2,8 @@ from DP_segmentation_model  import DP_word_segmentation_model
 from PYP_segmentation_model import PYP_word_segmentation_model
 import json
 import os.path
+import argparse
+from argparse import RawTextHelpFormatter
 
 
 __DEFAULT_DATAFILE__ = 'br-phono-train.txt'
@@ -264,24 +266,24 @@ def exp07():
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 	parser.add_argument('--runall', help="""runs all experiments that were detailed in the report
-			     Can not be used in combination with other parameters.""")
-	parser.add_argument('--cf', help='corpus file')
-	parser.add_argument('--t', help='temperature regime. will also influence the amount of iterations.')
-	parser.add_argument('--p_0', help='p_0')
-	parser.add_argument('--a', help='alpha_0')
-	parser.add_argument('--b', help='beta_0. Only used for PYP experiments')
-	parser.add_argument('--p_dash', help='p_dash')
-	parser.add_argument('--init', help="""Initialization. valid options are \n 
-			    'true_init': initializes algorithm with the correct boundaries \n
-			    'no_init': initializes without boundaries \n
-			    'random_0.33_init': initialize 1/3 of the boundaries randomly \n
-			    'random_0.66_init': initialize 1/3 of the boundaries randomly \n
-			    'all_init': initialize all of the boundaries randomly
-			    """)
-	parser.parse_args()
-	if runall:
+Can not be used in combination with other parameters.""", default=False)
+	parser.add_argument('--cf', help='corpus file', default='br-phono-train.txt')
+	parser.add_argument('--t', help='temperature regime. will also influence the amount of iterations.', type=int, default=0)
+	parser.add_argument('--p_0', help='p_0', type=str, default='uniform')
+	parser.add_argument('--a', help='alpha_0', type=int, default=20)
+	parser.add_argument('--b', help='beta_0. Only used for PYP experiments', type=int, default=0)
+	parser.add_argument('--p_dash', help='p_dash', type=int, default=0.5)
+	parser.add_argument('--init', help="""Initialization. valid options are: 
+'true_init': initializes algorithm with the correct boundaries 
+'no_init': initializes without boundaries 
+'random_0.33_init': initialize 1/3 of the boundaries randomly
+'random_0.66_init': initialize 1/3 of the boundaries randomly
+'all_init': initialize all of the boundaries randomly
+			    """, type=str, default='true_init')
+	args = parser.parse_args()
+	if args.runall:
 		exp07()
 		exp06()
 		exp01()
@@ -290,36 +292,24 @@ if __name__ == '__main__':
 		exp04()
 		exp05()
 	else:
-		corpusfile = 'br-phono-train.txt'
-		temp_regime_id = 0
-		P0_method='uniform'
-		initialization = 'true_init'
-		if cf:
-			corpusfile = cf
-		if t:
-			temp_regime_id= t
-		if p_0:
-			P0_method= p_0
-		if b:
-			s = PYP_word_segmentation_model(corpus_file, temp_regime_id, P0_method)
-			s.beta = b 
+		s = DP_word_segmentation_model(args.cf, args.t, args.p_0)
+		if args.b:
+			s = PYP_word_segmentation_model(args.cf, args.t, args.p_0)
+			s.beta = args.b 
 		else:
-			s = DP_word_segmentation_model(corpus_file, temp_regime_id, P0_method)
-		if a:
-			s.alpha = a
-		if p_dash:
-			s.p_dash = p_dash
-		if init:
-			if init == 'true_init':
-				pass
-			if init == 'no_init':
-				s.remove_all_boundaries()
-			elif init == 'random_0.33_init':
-				s.initialize_boundaries_randomly(1.0 / 3)
-			elif init == 'random_0.66_init':
-				s.initialize_boundaries_randomly(2.0 / 3)
-			elif init == 'all_init':
-				s.initialize_boundaries_randomly(1.0)
-			else:
-				raise Exception('incorrect init argument')
-		run_experiment(s, 'custom experiment', '', corpus_file)
+			s = DP_word_segmentation_model(args.cf, args.t, args.p_0)
+		s.alpha = args.a
+		s.p_dash = args.p_dash
+		if args.init == 'true_init':
+			pass
+		elif args.init == 'no_init':
+			s.remove_all_boundaries()
+		elif args.init == 'random_0.33_init':
+			s.initialize_boundaries_randomly(1.0 / 3)
+		elif args.init == 'random_0.66_init':
+			s.initialize_boundaries_randomly(2.0 / 3)
+		elif args.init == 'all_init':
+			s.initialize_boundaries_randomly(1.0)
+		else:
+			raise Exception('incorrect init argument')
+		run_experiment(s, 'custom experiment', '', args.cf)
