@@ -3,6 +3,8 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+from matplotlib import cm
+import colormaps as cmaps
 
 """
 This script makes plots from all files in the "results" folder,
@@ -11,12 +13,15 @@ It seperates filenames on the "-" character.
 
 If the last part is a number, it makes seperate plots for precision, recall
 and F0, with the last number on the x-axis (for example, a results folder
-containing "exp02-alpha-1.json" and "exp02-alpha-2.json" would make 9 plots
-with alpha on the x-axis and precision, either precision, recall or f0 on the
-y axes for each plot, done for words, boundaries and lexicons)
+containing "exp02-alpha-1.json" and "exp02-alpha-2.json" would make 3 plots
+with alpha on the x-axis and either precision, recall or f0 on the
+y axes for each plot, done for words, boundaries and lexicons(so 3 lines per plot))
 
 If the last part is not a number, make 3 plots that plot performance on the
 y-axis and time on the x-axis. Each file will have its seperate line.
+
+Experiments 6 and 7 are different since they are experiments with PYP.
+Therefore these have their own plotting procedures.
 """
 
 matplotlib.rcParams.update({'font.size': 14})
@@ -59,7 +64,7 @@ for exp_type in experiments:
     experiment_print_name = experiment_print_name.replace("P0", "$P_0$")    
 
     
-    # These experiments are somewhot different
+    # These experiments are somewhat different
     if exp_type == 'exp06':
         print 'processing data for ' + exp_type
         alphas    = []
@@ -68,6 +73,7 @@ for exp_type in experiments:
         precision = {}
         recall    = {}
         f0        = {}
+        logs      = []
 
 
 
@@ -77,6 +83,7 @@ for exp_type in experiments:
             print file_name
             exp_output = json.load(f)
             evaluation = exp_output['evaluation']
+            logs.append(exp_output['logs'])
 
             betas.append( float( str.split(file_name, '-')[-1]) )
             alphas.append(float( str.split(file_name, '-')[-3]) )
@@ -107,7 +114,7 @@ for exp_type in experiments:
                 size_scale = 800 * m
                 
 
-                plt.scatter(alphas, betas, c=m, s=size_scale)
+                plt.scatter(alphas, betas, c=m, s=size_scale, cmap=cmaps.viridis)
                 plt.xscale('log')
                 plt.xlabel(r'$\alpha$')
                 plt.clim(0,1)
@@ -124,6 +131,39 @@ for exp_type in experiments:
             exp06['evaluation'] = evaluation
             exp06['alphas'] = alphas
             exp06['betas']  = betas
+
+
+
+        print 'making more plots for ' + exp_type 
+        
+        #subplot: word, word type, log p
+        colors = [ cmaps.viridis(1.0 * x / len(set(betas))) for x in range(len(set(betas))) ]
+
+        for i, y  in enumerate(['P_corpus','n_types','n_tokens']):
+
+            plt.subplot(1,3, i + 1)
+            plt.title(y)
+
+            #lines, use nice colors
+            for b, beta in enumerate(set(betas)):
+                alpha  = 20
+                useInd = np.where((np.asarray(exp06['betas']) == beta) & (np.asarray(exp06['alphas']) == alpha))[0][0]
+
+                #get correspondint betas and sort alphas and indices
+                y_axis = logs[useInd][y]
+                x_axis = range(1, len(y_axis)+1)
+                plt.plot(x_axis, y_axis, label=r'$\beta=%.2f$' % beta, c=colors[b])
+
+
+            plt.xlabel('iteration', fontsize=18)
+            plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
+            leg = plt.legend(loc='lower right', title=experiment_print_name + ':')
+            for legobj in leg.legendHandles:
+                legobj.set_linewidth(2.0)
+            plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+        plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
+        plt.clf() #clear the plot figure
+
         
 
 
@@ -133,6 +173,7 @@ for exp_type in experiments:
         useInds = np.where(np.asarray(exp06['betas']) == 0)[0]
     
         #get correspondint alphas and sort alphas and indices
+        #get corresponding alphas and sort alphas and indices
         alphas = np.array(exp06['alphas'])[useInds]
         alphas, useInds = zip(*sorted(zip(alphas,useInds)))
         useInds = list(useInds)
@@ -167,7 +208,7 @@ for exp_type in experiments:
                 append_to_dict(evaluation['recall'], k, cur_eval[k][1])
                 append_to_dict(evaluation['F0'], k, cur_eval[k][2])
 
-        print 'making plots for exp07'
+        print 'making plots for ' + exp_type
         for measure in evaluation.keys():
             plt.figure()
             sorted_x = sorted(alphas)
@@ -184,11 +225,7 @@ for exp_type in experiments:
         plt.clf() #clear the plot figure          
 
 
-
     #Check if we have to plot numbers on the x-axis
-    elif True:
-        print 'LOl'
-
     elif is_number(str.split(file_list[0], '-')[-1]):
         print 'processing data for ' + exp_type
         precision = {}
@@ -208,11 +245,6 @@ for exp_type in experiments:
                 append_to_dict(recall, k, evaluation[k][1])
                 append_to_dict(f0, k, evaluation[k][2])
         #plot the stuff and save it
-        """
-        print precision
-        print recall
-        print f0
-        """
         print 'making plots for ' + exp_type
         sorted_x = sorted(x_axis)
 
@@ -251,6 +283,7 @@ for exp_type in experiments:
     else: #we have to plot log probabilities over time
         print 'processing data for ' + exp_type
         performance = {}
+
         for file_name in file_list:
             f = open('results/' + file_name + '.json', 'r')
             print file_name
@@ -259,12 +292,25 @@ for exp_type in experiments:
             if 'P_corpus' in logs:
                 performance[str.split(file_name, '-')[-1]] = logs['P_corpus']
 
-        for k in performance:
+        colors = [ cmaps.viridis(1.0 * x / len(performance)) for x in range(len(performance)) ]
+
+        #hack to get the legend in the right order for the initialisation experiment
+        keys = performance.keys()
+        if experiment_name == 'initialisation':
+            keys = ['true','100%','66%','33%','0%']
+
+        for i, k in enumerate(keys):
             x_axis = range(1, len(performance[k])+1)
-            plt.plot(x_axis, performance[k], label=k)
+            plt.plot(x_axis, performance[k], label=k, color=colors[i])
+            if experiment_name == 'initialisation':
+                dot = plt.scatter(0, performance[k][0], marker='o', color=colors[i],s=20)
+                dot.set_clip_on(False)
         plt.xlabel('iteration', fontsize=18)
+        plt.xlim([0, x_axis[-1]])
         plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
-        plt.legend(loc='lower right', title=experiment_print_name + ':')
+        leg = plt.legend(loc='lower right', title=experiment_print_name + ':')
+        for legobj in leg.legendHandles:
+            legobj.set_linewidth(2.0)
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
         plt.clf() #clear the plot figure

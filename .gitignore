@@ -5,3 +5,9 @@ report/*.blg
 report/*.log
 report/*.pdf
 report/*.synctex.gz
+report/*/*.aux
+report/*/*.bbl
+report/*/*.blg
+report/*/*.log
+report/*/*.pdf
+report/*/*.synctex.gz

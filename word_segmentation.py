@@ -156,9 +156,13 @@ class Word_segmentation_model(object):
 
 			#update log
 			if 'P_corpus'    in log: logs['P_corpus'].append( self.P_corpus())
-			if 'n_types'     in log: logs['n_types'].append( len(self.word_counts))
+			if 'n_types'     in log: logs['n_types'].append( len(self.getWordCounts()))
 			if 'n_tokens'    in log: logs['n_tokens'].append( self.total_word_count)
 			if 'temperature' in log: logs['temperature'].append( temperature)
+			if 'K' in log:
+				try: logs['K'].append(self.K)
+				except: pass
+
 
 
 		if log: return logs
