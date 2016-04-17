@@ -1,7 +1,7 @@
 import json
 import os
 import utils
-from segmented_corpus import segmented_corpus
+import word_segmentation
 from operator import itemgetter
 
 # Make output directory
@@ -11,7 +11,7 @@ if not os.path.exists(utterances_dir):
     os.makedirs(utterances_dir)
 
 # Read results files
-results_dir = 'results/'
+results_dir = 'results 3/'
 
 data = {}
 
@@ -27,8 +27,8 @@ def apply_boundaries(file, datafile, boundaries):
     for utterance, actual_boundaries, boundaries in zip(utterances, actual_boundaries, boundaries):
         delimiter = ' '
 
-        actual_utterance = segmented_corpus.insert_boundaries(utterance, actual_boundaries, delimiter=delimiter)
-        predicted_utterance = segmented_corpus.insert_boundaries(utterance, boundaries, delimiter=delimiter)
+        actual_utterance = word_segmentation.insert_boundaries(utterance, actual_boundaries, delimiter=delimiter)
+        predicted_utterance = word_segmentation.insert_boundaries(utterance, boundaries, delimiter=delimiter)
 
         precision, recall, f0 = utils.eval_words([boundaries], [actual_boundaries])
 

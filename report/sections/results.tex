@@ -2,7 +2,7 @@
 
 \subsection{$P_0$ distribution choice}
 
-Figure \ref{fig:P0_logprob} shows the effect of phoneme distribution choice on the log joint probability. It turns out that the choice does hardly influences the log joint probability at all.
+Figure \ref{fig:P0_logprob} shows the effect of phoneme distribution choice on the log joint probability. It turns out that the choice hardly influences the log joint probability at all.
 
 \begingroup
     \centering
@@ -15,7 +15,7 @@ Figure \ref{fig:P0_logprob} shows the effect of phoneme distribution choice on t
 
 \subsubsection{Temperature regime}
 
-Figure \ref{fig:temp_logprob} shows the effect of temperature regime on the log joint probability over time. We conclude that regime 2, which starts very low and increments the temperature by a small amount relatively often, leads to the highest log joint probability, both initially and after many iterations.
+Figure \ref{fig:temp_logprob} shows the effect of temperature regime on the log joint probability over time. The temperature steps can clearly be seen by the sudden decreases in slope. We conclude that regime 2, which starts very low and increments the temperature by a small amount relatively often, leads to the highest log joint probability. However, for all regimes it seems that convergence is not reached in the end, as there is still some increase in probability.  
 
 \begingroup
     \centering
@@ -25,19 +25,21 @@ Figure \ref{fig:temp_logprob} shows the effect of temperature regime on the log 
 \endgroup
 
 \subsubsection{Initialisation strategy}
+Initialisation
+Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the log joint probability over time. As expected, the true initialisation results in the highest probability before the sampler is started. Running the sampler however does not increase the probability for this initialisation.
 
-Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the log joint probability over time. It shows that not initialising the boundaries at all leads to the highest log joint probability, both initally and after many iterations.
+For all random initialisations, the sampler does increase the corpus probability, and seems to converge over time. Lower proportions of boundary initialisation result in higher probabilities.
 
 \begingroup
     \centering
     \includegraphics[width=0.5\textwidth]{images/initialisation-log_prob}
-    \captionof{figure}{The effect of initialisation strategy on the log joint probability over time.}
+    \captionof{figure}{The effect of initialization strategy on the log joint probability over time. Percentage indicate the proportion of boundaries that are chosen (randomly). Dots indicate the value before sampling.}
     \label{fig:init_logprob}
 \endgroup
 
 \subsection{Model parameters}
 
-Figure \ref{fig:model_parameters} shows the effect of different model parameter choices on the $F_0$-measure, evaluated on words, boundaries and the lexicon. The effect is mostly visible at the lexicon level, favouring higher values for both $\alpha_0$ and $p_\#$, but it does not seem to affect the $F_0$-measure of the words and boundaries much.
+Figure \ref{fig:model_parameters} shows the effect of different model parameter choices on the $F_0$-measure, evaluated on words, boundaries and the lexicon. The effect is mostly visible at the lexicon level, favoring higher values for both $\alpha_0$ and $p_\#$, but it does not seem to affect the $F_0$-measure of the words and boundaries much. Similar results (not reported) were found for precision and recall.
 
 %\end{multicols}{2}
 \begin{figure}[!ht]
@@ -69,7 +71,7 @@ Table \ref{tab:model_params} shows the retrieval quality of the model evaluated 
 
 \subsection{Qualitative results}
 
-To find out why the model does not perform perfectly, we must analyse the segmentation that is produces. Below are some good and bad examples.\\
+To find out why the model does not perform perfectly, we must analyze the segmentation that it produces. Below are some good and bad examples.\\
 
 
 \begin{multicols}{2}
@@ -102,37 +104,34 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 
 \end{multicols}
 
-
-
-
-We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model undersegments these utterances.
+We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack some boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model under-segments these utterances.
 
 \subsection{PYP Model}
 
 \subsubsection{Comparison to DP model}
-Figure \ref{fig:PYPvsDP} shows the comparison between the DP model and the PYP model with the $\beta$ parameter set to zero. It can be seen that the models perform equally well. A investigation of the corpus probability over time showed that the convergence of both models was also similar.
+Figure \ref{fig:PYPvsDP} shows the comparison between the DP model and the PYP model with the $\beta$ parameter set to zero. It can be seen that the models perform equally well. A investigation of the corpus probability over time showed that the convergence of both models was also similar. (see Figure \ref{fig:PYPiter})
 
 \begingroup
     \centering
     \includegraphics[width=0.5\textwidth]{images/DP-vs-PYP-recall}
-    \captionof{figure}{A comparison of the DP model with the PYP model (with $\beta$ set to 0}
+    \captionof{figure}{A comparison of the DP model with the PYP model (with $\beta$ set to 0)}
     \label{fig:PYPvsDP}
 \endgroup
 
 \subsubsection{Parameter settings}
-Figure \ref{fig:gridF0} shows the results of a grid search for different values of $\alpha$ and $\beta$. It can be seen that for each of the three measures, the best results are achieved when $\beta$ = 0. When $\beta$ is set to another value, performance decreases dramatically. 
+Figure \ref{fig:gridF0} shows the results of a grid search for different values of $\alpha$ and $\beta$. It can be seen that for each of the three measures, the best results are achieved when $\beta$ = 0. When $\beta$ is set to another value, performance decreases dramatically.
 Figure  shows the comparison between the DP model and the PYP model with the $\beta$ parameter set to zero. It can be seen that the models perform equally well. A investigation of the corpus probability over time showed that the convergence of both models was also similar.
 
 \begingroup
     \centering
     \includegraphics[width=0.9\textwidth]{images/PYP-F0}
-    \captionof{figure}{A comparison of the DP model with the PYP model (with $\beta$ set to 0}
+    \captionof{figure}{$F_0$ scores for different values for $\alpha$ and $\beta$ using the PYP model.}
     \label{fig:gridF0}
 \endgroup
 
 \subsubsection{Seating arrangement}
-Figure \ref{fig:PYPiter} shows the evolution of the seating arrangement over time. 
-The most salient result is that the patterns for each measure are very different for $\beta=0$ and all other values of $\beta$. 
+Figure \ref{fig:PYPiter} shows the evolution of the seating arrangement over time.
+The most salient result is that the patterns for each measure are very different for $\beta=0$ and all other values of $\beta$.
 
 For all measures, we see a convergence for $\beta = 0$, to a value that is very different from the original value. For any other value of $\beta$, there is a small change in the first iteration, but from then on, all measures remain constant across iterations.
 
@@ -147,3 +146,16 @@ In general $\beta=0$ commits to this trend, except for the number of tokens, whi
     \label{fig:PYPiter}
 \endgroup
 
+\subsubsection{Qualitative analysis}
+
+Below we list some of the errors that our model made. Under segmentation does occur, but in contrast with the DP model, we find many incorrect segmentations that are 'just wrong'. Some words are under segmented, whereas others are over segmented within the same sentence.
+\begin{itemize}
+\item \texttt{D6 dOgi l9ks tu ste In D*} (actual)\\ \texttt{D6dOgil9 kstust e InD*} (retrieved)
+\item \texttt{si} (actual)\\ \texttt{s i} (retrieved)
+\item \texttt{pUt D6 dOgi In hIz hQs} (actual)\\ \texttt{pU tD6d Og iI nh IzhQs} (retrieved)
+\item \texttt{go an} (actual)\\ \texttt{goa n} (retrieved)
+\item \texttt{ pUt hIm In hIz hQs} (actual)\\ \texttt{pU thImInhIzhQs} (retrieved)
+\item \texttt{v*i gUd} (actual)\\ \texttt{v* i g Ud} (retrieved)
+\item \texttt{nQ hi wants Qt 6gEn} (actual)\\ \texttt{n Q h iwa n tsQt 6 gEn} (retrieved)
+(retrieved)
+\end{itemize}
