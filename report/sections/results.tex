@@ -39,7 +39,7 @@ Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the
 
 Figure \ref{fig:model_parameters} shows the effect of different model parameter choices on retrieval quality, evaluated on words, boundaries and the lexicon. The effect is mostly visible at the lexicon level, favouring higher values for both $\alpha_0$ and $p_\#$, but it does not seem to affect the retrieval quality of the words and boundaries much.
 
-\end{multicols}{2}
+%\end{multicols}{2}
 \begin{figure}[!ht]
 \begin{tabular}{cccc}
 \subfloat[Precision for different values of $\alpha_0$]{\includegraphics[width=0.47\linewidth]{images/alpha-precision}} &
@@ -52,7 +52,7 @@ Figure \ref{fig:model_parameters} shows the effect of different model parameter 
 \caption{The effect of different values for $\alpha_0$ and $p_\#$ on retrieval quality evaluated on words, boundaries and the lexicon.}
 \label{fig:model_parameters}
 \end{figure}
-\begin{multicols}{2}
+%\begin{multicols}{2}
 
 %\FloatBarrier
 
@@ -61,7 +61,7 @@ Figure \ref{fig:model_parameters} shows the effect of different model parameter 
 To find out why the model does not perform perfectly, we must analyse the segmentation that is produces. Below are some good and bad examples.\\
 
 
-%\begin{multicols}{2}
+\begin{multicols}{2}
 \noindent\textbf{Good examples}
 
 \begin{itemize}
@@ -75,7 +75,7 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 \item \texttt{lEts si nQ hu goz W* D\&ts WAt 9d l9k tu no} (actual)\\ \texttt{lEtssi nQ hu goz W* D\&ts WAt 9d l9k tu no} (retrieved)
 \end{itemize}
 \vfill
-%\columnbreak
+\columnbreak
 \noindent\textbf{Bad examples}
 
 \begin{itemize}
@@ -89,7 +89,7 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 \item \texttt{v*i gUd} (actual)\\ \texttt{v*igUd} (retrieved)
 \end{itemize}
 
-%\end{multicols}
+\end{multicols}
 
 
 
