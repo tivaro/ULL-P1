@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+from matplotlib import cm
 
 """
 This script makes plots from all files in the "results" folder,
@@ -68,6 +69,7 @@ for exp_type in experiments:
         precision = {}
         recall    = {}
         f0        = {}
+        logs      = []
 
 
 
@@ -77,6 +79,8 @@ for exp_type in experiments:
             print file_name
             exp_output = json.load(f)
             evaluation = exp_output['evaluation']
+
+            logs.append(exp_output['logs'])
 
             betas.append( float( str.split(file_name, '-')[-1]) )
             alphas.append(float( str.split(file_name, '-')[-3]) )
@@ -124,6 +128,43 @@ for exp_type in experiments:
             exp06['evaluation'] = evaluation
             exp06['alphas'] = alphas
             exp06['betas']  = betas
+
+
+
+        print 'making more plots for ' + exp_type 
+        
+        #subplot: word, word type, log p
+        colors = [ cm.jet(1.0 * x / len(set(betas))) for x in range(len(set(betas))) ]
+
+        for i, y  in enumerate(['P_corpus','n_types','n_tokens']):
+
+            plt.subplot(1,3, i + 1)
+            plt.title(y)
+
+            #lines, use nice colors
+            for b, beta in enumerate(set(betas)):
+                alpha  = 20
+                useInd = np.where((np.asarray(exp06['betas']) == beta) & (np.asarray(exp06['alphas']) == alpha))[0][0]
+
+                #get correspondint betas and sort alphas and indices
+                y_axis = logs[useInd][y]
+                x_axis = range(1, len(y_axis)+1)
+                plt.plot(x_axis, y_axis, label=r'$\beta=%.2f$' % beta, c=colors[b])
+
+
+            plt.xlabel('iteration', fontsize=18)
+            plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
+            plt.legend(loc='lower right', title=experiment_print_name + ':')
+            plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+        plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
+        plt.clf() #clear the plot figure
+
+
+
+
+
+        #colors: beta = 0, 0.4, 1
+
         
 
 
@@ -167,7 +208,7 @@ for exp_type in experiments:
                 append_to_dict(evaluation['recall'], k, cur_eval[k][1])
                 append_to_dict(evaluation['F0'], k, cur_eval[k][2])
 
-        print 'making plots for exp07'
+        print 'making plots for ' + exp_type
         for measure in evaluation.keys():
             plt.figure()
             sorted_x = sorted(alphas)
@@ -186,9 +227,6 @@ for exp_type in experiments:
 
 
     #Check if we have to plot numbers on the x-axis
-    elif True:
-        print 'LOl'
-
     elif is_number(str.split(file_list[0], '-')[-1]):
         print 'processing data for ' + exp_type
         precision = {}
