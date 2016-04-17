@@ -272,6 +272,7 @@ if __name__ == '__main__':
 	parser.add_argument('--runall', help="""runs all experiments that were detailed in the report
 Can not be used in combination with other parameters.""", action='store_true')
 	parser.add_argument('--cf', help='corpus file', default='br-phono-train.txt')
+	parser.add_argument('--exp_name', help='name of the experiment', default='custom experiment')
 	parser.add_argument('--t', help='temperature regime. will also influence the amount of iterations.', type=int, default=0)
 	parser.add_argument('--p_0', help='p_0', type=str, default='uniform')
 	parser.add_argument('--a', help='alpha_0', type=int, default=20)
@@ -306,7 +307,8 @@ Can not be used in combination with other parameters.""", action='store_true')
 			s.initialize_boundaries_randomly(1.0)
 		else:
 			raise Exception('incorrect init argument')
-		run_experiment(s, 'custom experiment', '', args.cf)
+		run_experiment(s, args.exp_name, '', args.cf)
+		print 'output created in results/' + args.exp_name + '.json'
 	else:
 		print 'running all experiments'
 		exp07()
