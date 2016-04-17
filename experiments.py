@@ -37,6 +37,8 @@ def run_experiment(s, name, description, datafile):
 			# Store the obtained data
 			output['logs'] 		 = logs
 			output['evaluation'] = s.evaluate()
+			print 'scores:'
+			print output['evaluation']
 
 			#store the boundaries, given the datafile, this is the segementation of the lexicon
 			output['boundaries'] = s.boundaries
@@ -283,15 +285,7 @@ Can not be used in combination with other parameters.""", action='store_true')
 'all_init': initialize all of the boundaries randomly
 			    """, type=str, default='true_init')
 	args = parser.parse_args()
-	if args.runall:
-		exp07()
-		exp06()
-		exp01()
-		exp02()
-		exp03()
-		exp04()
-		exp05()
-	else:
+	if not args.runall:
 		s = DP_word_segmentation_model(args.cf, args.t, args.p_0)
 		if args.b:
 			s = PYP_word_segmentation_model(args.cf, args.t, args.p_0)
@@ -313,3 +307,12 @@ Can not be used in combination with other parameters.""", action='store_true')
 		else:
 			raise Exception('incorrect init argument')
 		run_experiment(s, 'custom experiment', '', args.cf)
+	else:
+		print 'running all experiments'
+		exp07()
+		exp06()
+		exp01()
+		exp02()
+		exp03()
+		exp04()
+		exp05()
