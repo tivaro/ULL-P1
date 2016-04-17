@@ -112,7 +112,7 @@ class Word_segmentation_model(object):
 			M = len(word)
 			Pphoneme = np.prod([self.P_phoneme(x) for x in list(word)])
 
-			self.P0_cache[word] = self.p_dash * ((self.p_dash)**(M-1)) * Pphoneme
+			self.P0_cache[word] = self.p_dash * ((1 - self.p_dash)**(M-1)) * Pphoneme
 
 		return self.P0_cache[word]
 
