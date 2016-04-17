@@ -11,6 +11,7 @@
 \usepackage{amsfonts}
 \usepackage{epstopdf}
 \usepackage{subfig}
+\usepackage{multicol}
 
 \usepackage[margin=0.5in]{geometry}
 
@@ -25,6 +26,7 @@
 
 \maketitle
 
+\begin{multicols}{2}
 \input{sections/intro.tex}
 \input{sections/model.tex}
 \input{sections/experiments.tex}
@@ -32,8 +34,10 @@
 \input{sections/conclusion.tex}
 \input{sections/discussion.tex}
 
+
 %\nocite{*}
 \bibliographystyle{plain}
 \bibliography{report}
+\end{multicols}{2}
 
 \end{document}
