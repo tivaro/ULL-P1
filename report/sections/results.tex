@@ -24,14 +24,14 @@ Figure \ref{fig:temp_logprob} shows the effect of temperature regime on the log 
 	\label{fig:temp_logprob}
 \endgroup
 
-\subsubsection{Initialisation strategy}
+\subsubsection{Initialization strategy}
 
-Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the log joint probability over time. It shows that initialising the model the maximum number of boundaries results in the highest final joint probability. Note that initialising the model with the true boundaries results in a lower joint probability, although initially it gets the highest joint probability, unsurprisingly.
+Figure \ref{fig:init_logprob} shows the effect of initialization strategy on the log joint probability over time. It shows that initializing the model the maximum number of boundaries results in the highest final joint probability. Note that initializing the model with the true boundaries results in a lower joint probability, although initially it gets the highest joint probability, unsurprisingly.
 
 \begingroup
     \centering
     \includegraphics[width=0.5\textwidth]{images/initialisation-log_prob}
-    \captionof{figure}{The effect of initialisation strategy on the log joint probability over time.}
+    \captionof{figure}{The effect of initialization strategy on the log joint probability over time.}
     \label{fig:init_logprob}
 \endgroup
 
@@ -102,10 +102,7 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 
 \end{multicols}
 
-
-
-
-We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack some boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model undersegments these utterances.
+We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack some boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model under-segments these utterances.
 
 \subsection{PYP Model}
 
