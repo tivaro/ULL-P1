@@ -18,9 +18,13 @@ where $\mathbf{V}$ is the lexicon or vocabulary, $N$ is the total number of word
 
 We assess the quality of the retrieved segmentation using precision, recall and the $F_0$ measure. Like \cite{Goldwater200921}, we evaluate these measures on words (per utterance), on boundaries (per utterance, excluding the start and end of the utterance), and on the lexicon. This gives us nine retrieval measures for each experiment.
 
+\subsection{$P_0$ distribution}
+
+$P_0$ is the prior distribution over phonemes. We experiment with a uniform distribution, and one that is based on proportional counts in the corpus. We evaluate using the log joint probability over time.
+
 \subsection{Gibbs sampling}
 
-The retrieved segmentation depends in part on the Gibbs sampling procedure. We experiment with different temperature regimes and initialisation strategies.
+The retrieved segmentation depends in part on the Gibbs sampling procedure. We experiment with different temperature regimes and initialisation strategies. Like the choice of $P_0$ distribution, we evaluate the temperature regimes and initialisation strategries using the log joint probabiliy over time.
 
 \subsubsection{Temperature regime}
 
