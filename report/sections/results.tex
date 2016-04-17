@@ -95,3 +95,28 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 
 
 We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack boundaries. In other words, the model undersegments these utterances.
+
+\subsection{PYP Model}
+
+\subsubsection{Comparison to DP model}
+Figure \ref{fig:PYPvsDP} shows the comparison between the DP model and the PYP model with the $\beta$ parameter set to zero. It can be seen that the models perform equally well. A investigation of the corpus probability over time showed that the convergence of both models was also similar.
+
+\begingroup
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/DP-vs-PYP-recall}
+    \captionof{figure}{A comparison of the DP model with the PYP model (with $\beta$ set to 0}
+    \label{fig:PYPvsDP}
+\endgroup
+
+\subsubsection{Parameter settings}
+Figure \ref{fig:gridF0} shows the results of a grid search for different values of $\alpha$ and $\beta$. It can be seen that for each of the three measures, the best results are achieved when $\beta$ = 0. When $\beta$ is set to another value, performance decreases dramatically. 
+Figure  shows the comparison between the DP model and the PYP model with the $\beta$ parameter set to zero. It can be seen that the models perform equally well. A investigation of the corpus probability over time showed that the convergence of both models was also similar.
+
+\begingroup
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/PYP-F0}
+    \captionof{figure}{A comparison of the DP model with the PYP model (with $\beta$ set to 0}
+    \label{fig:gridF0}
+\endgroup
+
+
