@@ -2,7 +2,7 @@
 
 \subsection{$P_0$ distribution choice}
 
-Figure \ref{fig:P0_logprob} shows the effect of phoneme distribution choice on the log joint probability. It turns out that the choice does hardly influences the log joint probability at all.
+Figure \ref{fig:P0_logprob} shows the effect of phoneme distribution choice on the log joint probability. It turns out that the choice hardly influences the log joint probability at all.
 
 \begingroup
     \centering
@@ -26,7 +26,7 @@ Figure \ref{fig:temp_logprob} shows the effect of temperature regime on the log 
 
 \subsubsection{Initialisation strategy}
 
-Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the log joint probability over time. It shows that not initialising the boundaries at all leads to the highest log joint probability, both initally and after many iterations.
+Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the log joint probability over time. It shows that initialising the model the maximum number of boundaries results in the highest final joint probability. Note that initialising the model with the true boundaries results in a lower joint probability, although initially it gets the highest joint probability, unsurprisingly.
 
 \begingroup
     \centering
@@ -105,7 +105,7 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 
 
 
-We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model undersegments these utterances.
+We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack some boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model undersegments these utterances.
 
 \subsection{PYP Model}
 
@@ -120,7 +120,7 @@ Figure \ref{fig:PYPvsDP} shows the comparison between the DP model and the PYP m
 \endgroup
 
 \subsubsection{Parameter settings}
-Figure \ref{fig:gridF0} shows the results of a grid search for different values of $\alpha$ and $\beta$. It can be seen that for each of the three measures, the best results are achieved when $\beta$ = 0. When $\beta$ is set to another value, performance decreases dramatically. 
+Figure \ref{fig:gridF0} shows the results of a grid search for different values of $\alpha$ and $\beta$. It can be seen that for each of the three measures, the best results are achieved when $\beta$ = 0. When $\beta$ is set to another value, performance decreases dramatically.
 Figure  shows the comparison between the DP model and the PYP model with the $\beta$ parameter set to zero. It can be seen that the models perform equally well. A investigation of the corpus probability over time showed that the convergence of both models was also similar.
 
 \begingroup
@@ -131,8 +131,8 @@ Figure  shows the comparison between the DP model and the PYP model with the $\b
 \endgroup
 
 \subsubsection{Seating arrangement}
-Figure \ref{fig:PYPiter} shows the evolution of the seating arrangement over time. 
-The most salient result is that the patterns for each measure are very different for $\beta=0$ and all other values of $\beta$. 
+Figure \ref{fig:PYPiter} shows the evolution of the seating arrangement over time.
+The most salient result is that the patterns for each measure are very different for $\beta=0$ and all other values of $\beta$.
 
 For all measures, we see a convergence for $\beta = 0$, to a value that is very different from the original value. For any other value of $\beta$, there is a small change in the first iteration, but from then on, all measures remain constant across iterations.
 

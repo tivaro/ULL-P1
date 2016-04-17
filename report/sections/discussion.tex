@@ -1,7 +1,9 @@
 \section{Discussion}
 
-Overall, the outcomes of the experiments are underwhelming. In most cases, the effect on performance is very small. Of all the experiments, the initialisation strategy shows the largest effect on performance. The temperature regime can slihgtly improve learning speed and performance, but it does not make a large difference. The $\alpha_0$ parameter should not be to small, but after a certain value (e.g. $\alpha_0 > 20$), it does not really affect retrieval quality anymore. The same applies to the $p_\#$ parameter, where values greater than 0.5 are preferable.
+Of all the experiments, the initialisation strategy shows the largest effect on performance. Moreover, we note that although the initialisation with true boundaries has the highest joint probability on the corpus initially, it does not get the highest final joint probability. Assuming the true segmentation of the corpus is correct, we conclude that the model is in fact inadequate for this problem. This suggests that the assumption that words are independent units may not be a realistic assumption, and should be dropped or changed (to e.g. the bigram assumption).
 
-The results of our experiments do not directly match those of \cite{Goldwater200921}, but they are in the vicinity. We suspect that these differences may be caused by small implementation differences.
+For the rest of the experiments, the outcomes are underwhelming. In most cases, the effect on performance is very small. The temperature regime can slightly improve learning speed and performance, but it does not make a large difference. The $\alpha_0$ parameter should not be too small, but after a certain value (e.g. $\alpha_0 > 20$), it does not really affect retrieval quality anymore. The same applies to the $p_\#$ parameter, where values greater than 0.5 are preferable.
+
+The numeric results of our experiments do not directly match those of \cite{Goldwater200921}, but they are in the vicinity. We suspect that these differences may be caused by small implementation differences. However, our model suffers from the same problem as their unigram model: it tends to undersegment the corpus. Thus, our results confirm an important finding of \cite{Goldwater200921}, which is that the assumption that words are independent of each other is most likely inadequate.
 
 \todo[inline]{DP vs PYP...}
