@@ -1,1 +1,7 @@
 \section{Discussion}
+
+Overall, the outcomes of the experiments are underwhelming. In most cases, the effect on performance is very small. Of all the experiments, the initialisation strategy shows the largest effect on performance. The temperature regime can slihgtly improve learning speed and performance, but it does not make a large difference. The $\alpha_0$ parameter should not be to small, but after a certain value (e.g. $\alpha_0 > 20$), it does not really affect retrieval quality anymore. The same applies to the $p_\#$ parameter, where values greater than 0.5 are preferable.
+
+The results of our experiments do not directly match those of \cite{Goldwater200921}, but they are in the vicinity. We suspect that these differences may be caused by small implementation differences.
+
+\todo[inline]{DP vs PYP...}
