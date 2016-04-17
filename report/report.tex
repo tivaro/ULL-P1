@@ -5,13 +5,14 @@
 
 \usepackage{todonotes}
 \usepackage{amsmath}
-\usepackage{algorithm}
+\usepackage[boxruled, linesnumbered]{algorithm2e}
 \usepackage[noend]{algpseudocode}
 \usepackage{bm}
 \usepackage{amsfonts}
 \usepackage{epstopdf}
 \usepackage{subfig}
-\usepackage{multicol}
+\usepackage{placeins}
+\usepackage{multicol, caption}
 
 \usepackage[margin=0.5in]{geometry}
 
@@ -22,11 +23,15 @@
 \def\BState{\State\hskip-\ALG@thistlm}
 \makeatother
 
+\let\oldnl\nl% Store \nl in \oldnl
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}
+
 \begin{document}
 
 \maketitle
 
 \begin{multicols}{2}
+
 \input{sections/intro.tex}
 \input{sections/model.tex}
 \input{sections/experiments.tex}
@@ -38,6 +43,6 @@
 %\nocite{*}
 \bibliographystyle{plain}
 \bibliography{report}
-\end{multicols}{2}
+\end{multicols}
 
 \end{document}
