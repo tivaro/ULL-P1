@@ -1,1 +1,16 @@
 \section{Introduction}
+
+The problem of how infants learn to identify individual words in spoken language has been the topic of many research projects for some time now. Since words in a sentence are rarely spoken in isolation (i.e. with pauses in between), there is no trivial way for infants to learn where word boundaries are. This has caused researchers to suspect that infants actually employ statistical strategies as a first step in learning word boundaries, in which statistical regularities play an important role \cite{thiessen2003cues}.
+
+Early work on statistical word segmentation relies on the observation that transitions between syllables or phonemes are generally less predictable at word boundaries than within words (\cite{harris1970phoneme}, \cite{saffran1996statistical}), which can give the learner a cue as to whether or not there should be word boundary. Behavioural research has shown that infants are sensitive to this effect \cite{saffran1996statistical} \cite{aslin1998computation}. This gives rise to the assumption that words are units that, to some degree, help predict other units in a sentence.
+
+\citet{Goldwater200921} proposed a Bayesian framework for the statistical word segmentation problem with the goal to identify the assumptions the learner must make in order to correctly segment (real) natural language. They investigate what kind of words learners with different assumptions are able to identify, using a corpus of phonetically transcribed child-directed speech. Specifically, they test the hypothesis that words are statistically independent units, to which end they developed two different models.
+
+The first model is a unigram model: it treats each word independently (i.e. words do not predict later words). They find that this model has a tendency to undersegment the corpus, by identifying frequently co-occuring sequences as a single word. For example, because sequences like \textit{would you} and \textit{that's a} are relatively common, the learner may be tempted to classify these sequences as single words (i.e. \textit{wouldyou} and \textit{thatsa}).
+
+The second model is a bigram model that assumes that words can predict later words. That is, this model assumes that the choice of a word is conditioned on the previous word. Because of this assumption this model is able to greatly reduce the problem of undersegmentation.
+
+\todo[inline]{heel kort (in woorden) het model omschrijven?}
+
+The goal of this project is to reproduce the unigram model by \citet{Goldwater200921} and to replicate their results. We experiment with different intialization strategies and parameter values and show their effect on precision, recall and the $F_0$-measure. In a qualitative analysis we show that the unigram model does indeed have a tendency to undersegment the corpus. Finally, we discuss the merits and shortcomings of this model.
+
