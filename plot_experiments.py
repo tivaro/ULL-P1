@@ -51,7 +51,7 @@ def append_to_dict(d, key, elem):
         d[key].append(elem)
 
 plot_dir = './plot/'
-result_dir = "results 3"
+result_dir = "results"
 if not os.path.exists(plot_dir):
     print 'making plot directory'
     os.makedirs(plot_dir)
@@ -60,7 +60,6 @@ if not os.path.exists(plot_dir):
 #group all experiment results that are part of the same experiment
 experiments = {}
 print 'grouping experiments'
-import FAILURE_FIX
 for f_name in os.listdir(result_dir):
     if f_name.endswith(".json"):
         exp_type = str.split(f_name, '-')[0]
@@ -170,6 +169,8 @@ for exp_type in experiments:
                     dot = plt.scatter(0, y_axis[0], marker='o', color=colors[b],s=20)
                     dot.set_clip_on(False)
                     plt.xlim([0, x_axis[-1]])
+
+                    plt.yscale(log)
                 except:
                     pass
 

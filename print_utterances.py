@@ -11,7 +11,7 @@ if not os.path.exists(utterances_dir):
     os.makedirs(utterances_dir)
 
 # Read results files
-results_dir = 'results 3/'
+results_dir = 'results/'
 
 data = {}
 
