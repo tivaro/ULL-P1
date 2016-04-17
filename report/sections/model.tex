@@ -20,7 +20,7 @@ Where $n_{\ell}^{(\wmin)}$ is the number of times the label $\ell$ occurs in the
 
 \subsubsection{Inference}
 
-For gibs sampling, we pick a random boundary and propose two hypothesis:
+For Gibbs sampling, we pick a random boundary and propose two hypothesis:
 \\
 $h_1$: There is no boundary at this location \\
 $h_2$: There is a boundary at this location
@@ -52,8 +52,8 @@ P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
 \begin{algorithm}[H]
 	\caption{Pseudo algorithm}
     \label{alg:quad}
-    \nonl  \SetSideCommentLeft \emph{Initialisation} \\
-    $\textit{segmentation} \gets \text{initialise randomly}$ \\ 
+    \nonl  \SetSideCommentLeft \emph{Initialization} \\
+    $\textit{segmentation} \gets \text{initialize randomly}$ \\ 
     $seating \gets \emptyset$ \\
     
     \For{all words $w_i$ in segmentation}{
@@ -92,4 +92,4 @@ P(h_2 | h^-) &= P(w_2,w_3|h^-)\\
 where addCustomer adds customers to a table proportional to (2) \\
 and removeCustomer selects one of the tables of the word, proportional to it's count. \\
 \\
-Both functions will also update K, and remove the tables if they have become empty
+Both functions will also update K, and remove the tables if they have become empty.
