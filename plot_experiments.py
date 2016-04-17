@@ -40,6 +40,7 @@ def append_to_dict(d, key, elem):
         d[key].append(elem)
 
 plot_dir = './plot/'
+result_dir = "results 3"
 if not os.path.exists(plot_dir):
     print 'making plot directory'
     os.makedirs(plot_dir)
@@ -48,7 +49,8 @@ if not os.path.exists(plot_dir):
 #group all experiment results that are part of the same experiment
 experiments = {}
 print 'grouping experiments'
-for f_name in os.listdir("results"):
+import FAILURE_FIX
+for f_name in os.listdir(result_dir):
     if f_name.endswith(".json"):
         exp_type = str.split(f_name, '-')[0]
         append_to_dict(experiments, exp_type, os.path.splitext(f_name)[0])
@@ -59,7 +61,7 @@ for exp_type in experiments:
     experiment_name = str.split(file_list[0], '-')[1]
     experiment_print_name = experiment_name
     experiment_print_name = experiment_print_name.replace("_", " ")
-    experiment_print_name = experiment_print_name.replace("p dash", "$p_\$$")
+    experiment_print_name = experiment_print_name.replace("p dash", "$p_\#$")
     experiment_print_name = experiment_print_name.replace("alpha", r"$\alpha$")
     experiment_print_name = experiment_print_name.replace("P0", "$P_0$")    
 
@@ -79,7 +81,7 @@ for exp_type in experiments:
 
         for file_name in file_list:
 
-            f = open('results/' + file_name + '.json', 'r')
+            f = open(result_dir + '/' + file_name + '.json', 'r')
             print file_name
             exp_output = json.load(f)
             evaluation = exp_output['evaluation']
@@ -123,7 +125,7 @@ for exp_type in experiments:
                 if (i + 1) == len(precision): plt.colorbar()
 
             plt.suptitle(x)
-            plt.savefig(plot_dir + 'PYP-' + x + '.eps', format='eps')
+            plt.savefig(plot_dir + 'PYP-' + x + '.eps', format='eps', bbox_inches='tight')
             plt.clf() #clear the plot figure
 
             #store for the next plot
@@ -139,29 +141,69 @@ for exp_type in experiments:
         #subplot: word, word type, log p
         colors = [ cmaps.viridis(1.0 * x / len(set(betas))) for x in range(len(set(betas))) ]
 
-        for i, y  in enumerate(['P_corpus','n_types','n_tokens']):
+        for i, y  in enumerate(['P_corpus','n_types','n_tokens', 'K']):
 
-            plt.subplot(1,3, i + 1)
+            plt.subplot(1,4, i + 1)
             plt.title(y)
 
             #lines, use nice colors
-            for b, beta in enumerate(set(betas)):
-                alpha  = 20
+            for b, beta in enumerate(sorted(set(betas))):
+                alpha  = 1
                 useInd = np.where((np.asarray(exp06['betas']) == beta) & (np.asarray(exp06['alphas']) == alpha))[0][0]
 
                 #get correspondint betas and sort alphas and indices
-                y_axis = logs[useInd][y]
-                x_axis = range(1, len(y_axis)+1)
-                plt.plot(x_axis, y_axis, label=r'$\beta=%.2f$' % beta, c=colors[b])
+                try:
+                    y_axis = logs[useInd][y]
+                    x_axis = range(1, len(y_axis)+1)
+                    plt.plot(x_axis, y_axis, label=r'$\beta=%.2f$' % beta, c=colors[b])
+                    dot = plt.scatter(0, y_axis[0], marker='o', color=colors[b],s=20)
+                    dot.set_clip_on(False)
+                    plt.xlim([0, x_axis[-1]])
+                except:
+                    pass
 
 
             plt.xlabel('iteration', fontsize=18)
             plt.ylabel('$\ln \ \ p(\mathbf{w})$', fontsize=14) #TODO find a better name for this
-            leg = plt.legend(loc='lower right', title=experiment_print_name + ':')
+            if i == 3:
+                leg = plt.legend(loc='lower right')
+                for legobj in leg.legendHandles:
+                    legobj.set_linewidth(2.0)
+            plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+        plt.savefig(plot_dir + experiment_name + '-' + 'iter_plots.eps', format='eps', bbox_inches='tight')
+        plt.clf() #clear the plot figure
+
+
+        print 'making even plots for ' + exp_type 
+
+        for i, y  in enumerate(['P_corpus','n_types','n_tokens', 'K']):
+
+            plt.subplot(1,4, i + 1)
+            plt.title(y)
+
+            for b, beta in enumerate(sorted(set(betas))):
+                useInds = np.where(np.asarray(exp06['betas']) == beta)[0]
+
+                alphas = np.array(exp06['alphas'])[useInds]
+                alphas, useInds = zip(*sorted(zip(alphas,useInds)))
+                useInds = list(useInds)
+
+                try:
+                    y_axis = [logs[i][y][-1] for i in useInds]
+                    plt.plot(alphas, y_axis, label=r'$\beta=%.2f$' % beta, c=colors[b], marker='.')
+                except:
+                    pass
+
+            plt.ylabel(y)
+            plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+        plt.xlabel(r'$\alpha$', fontsize=18)
+        try:
+            leg = plt.legend(loc='lower right')
             for legobj in leg.legendHandles:
                 legobj.set_linewidth(2.0)
-            plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-        plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
+        except:
+            pass
+        plt.savefig(plot_dir + experiment_name + '-' + 'grid_NK.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure
 
         
@@ -172,7 +214,6 @@ for exp_type in experiments:
         #select only experiments where beta = 0
         useInds = np.where(np.asarray(exp06['betas']) == 0)[0]
     
-        #get correspondint alphas and sort alphas and indices
         #get corresponding alphas and sort alphas and indices
         alphas = np.array(exp06['alphas'])[useInds]
         alphas, useInds = zip(*sorted(zip(alphas,useInds)))
@@ -198,7 +239,7 @@ for exp_type in experiments:
         #gather all the values
         for file_name in file_list:
             alphas.append(float(str.split(file_name, '-')[-1]))
-            f = open('results/' + file_name + '.json', 'r')
+            f = open(result_dir + '/' + file_name + '.json', 'r')
             print file_name
             exp_output = json.load(f)
             cur_eval = exp_output['evaluation']
@@ -221,9 +262,8 @@ for exp_type in experiments:
             plt.ylabel(measure, fontsize=14)
             plt.ylim([0, 1])
             plt.legend(loc='lower right')
-            plt.savefig(plot_dir + 'DP-vs-PYP' + '-' + measure + '.eps', format='eps')
+            plt.savefig(plot_dir + 'DP-vs-PYP' + '-' + measure + '.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure          
-
 
     #Check if we have to plot numbers on the x-axis
     elif is_number(str.split(file_list[0], '-')[-1]):
@@ -235,7 +275,7 @@ for exp_type in experiments:
         #gather all the values
         for file_name in file_list:
             x_axis.append(float(str.split(file_name, '-')[-1]))
-            f = open('results/' + file_name + '.json', 'r')
+            f = open(result_dir + '/' + file_name + '.json', 'r')
             print file_name
             exp_output = json.load(f)
             evaluation = exp_output['evaluation']
@@ -256,7 +296,7 @@ for exp_type in experiments:
         plt.ylabel('Precision', fontsize=14)
         plt.ylim([0, 1])
         plt.legend(loc='lower right')
-        plt.savefig(plot_dir + experiment_name + '-' + 'precision.eps', format='eps')
+        plt.savefig(plot_dir + experiment_name + '-' + 'precision.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure
 
         for k in recall:
@@ -266,7 +306,7 @@ for exp_type in experiments:
         plt.ylabel('Recall', fontsize=14)
         plt.ylim([0, 1])
         plt.legend(loc='lower right')
-        plt.savefig(plot_dir + experiment_name + '-' + 'recall.eps', format='eps')
+        plt.savefig(plot_dir + experiment_name + '-' + 'recall.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure
 
         for k in f0:
@@ -276,7 +316,7 @@ for exp_type in experiments:
         plt.ylabel('$F_0$', fontsize=14)
         plt.ylim([0, 1])
         plt.legend(loc='lower right')
-        plt.savefig(plot_dir + experiment_name + '-' + 'f0.eps', format='eps')
+        plt.savefig(plot_dir + experiment_name + '-' + 'f0.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure
 
 
@@ -285,7 +325,7 @@ for exp_type in experiments:
         performance = {}
 
         for file_name in file_list:
-            f = open('results/' + file_name + '.json', 'r')
+            f = open(result_dir + '/' + file_name + '.json', 'r')
             print file_name
             exp_output = json.load(f)
             logs = exp_output['logs']
@@ -312,5 +352,5 @@ for exp_type in experiments:
         for legobj in leg.legendHandles:
             legobj.set_linewidth(2.0)
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-        plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps')
+        plt.savefig(plot_dir + experiment_name + '-' + 'log_prob.eps', format='eps', bbox_inches='tight')
         plt.clf() #clear the plot figure
