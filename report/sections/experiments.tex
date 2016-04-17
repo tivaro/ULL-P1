@@ -15,3 +15,14 @@
  ($alpha$, $p_\$$)
 
 \subsection{PYP Model}
+
+Because $h^{-}$ has to be modelled explicitly in the PYP model, the sampling is computationally a lot more expensive than the sampler used in DP sampling. Therefore a different iteration scheme was used with only 4000 iterations, and three equal temperature steps (0.1, 1.1, 1.6).
+
+\subsection{Algorithm}
+Because the Gibbs sampling in the PYP model is slightly more complicated than the sampler for the DP model, some experiments were run, to test wether the sampler was implemented correctly. 
+First, the PYP model was run with the $\beta$ parameter set to 0. The results were compared to the DP model with the exact same parameters and temperature regime. Both models were expected to produce the same results.
+
+Next, the probability of the corpus was calculated and examined after each iteration. If the sampler was implemented 
+
+\subsection{Parameters}
+Both the concentration paramter $\alpha$ and the smoothing paramter $\beta$ effect the seating distribution and might therefore interact with eachother. In order to find the best settings for $\alpha$ and $\beta$, a grid search was conducted with $\alpha \in \{1, 2, 5, 10, 20, 50, 100, 500 \}$ and $\beta \in \{ 0.01, 0.1, 0.2, 0.4,0.6, 0.8, 1, 0 \}$
