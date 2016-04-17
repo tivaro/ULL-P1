@@ -24,14 +24,14 @@ Figure \ref{fig:temp_logprob} shows the effect of temperature regime on the log 
 	\label{fig:temp_logprob}
 \endgroup
 
-\subsubsection{Initialisation strategy}
+\subsubsection{Initialization strategy}
 
-Figure \ref{fig:init_logprob} shows the effect of initialisation strategy on the log joint probability over time. It shows that not initialising the boundaries at all leads to the highest log joint probability, both initally and after many iterations.
+Figure \ref{fig:init_logprob} shows the effect of initialization strategy on the log joint probability over time. It shows that not initializing the boundaries at all leads to the highest log joint probability, both initally and after many iterations.
 
 \begingroup
     \centering
     \includegraphics[width=0.5\textwidth]{images/initialisation-log_prob}
-    \captionof{figure}{The effect of initialisation strategy on the log joint probability over time.}
+    \captionof{figure}{The effect of initialization strategy on the log joint probability over time.}
     \label{fig:init_logprob}
 \endgroup
 
@@ -105,7 +105,7 @@ To find out why the model does not perform perfectly, we must analyse the segmen
 
 
 
-We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model undersegments these utterances.
+We see that the good examples consist mostly of very short utterances, which are arguably easier to segment than longer utterances. The bad examples consist mostly of quite long utterances, and we can clearly see that they all lack boundaries. The boundaries that the model did find in these cases, are mostly correct. In other words, the model under-segments these utterances.
 
 \subsection{PYP Model}
 
